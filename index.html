@@ -5,45 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jariah 深度配對系統</title>
     <style>
-        :root { --main-purple: #764ba2; --accent: #ff4757; --bg: #ecedf2; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
+        :root { --main-purple: #764ba2; --bg: #ecedf2; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
         .app-container { width: 100%; max-width: 450px; }
         .card { background: white; border-radius: 25px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 20px; }
         h2 { text-align: center; color: #333; margin-top: 0; }
-        .section-title { font-size: 15px; font-weight: bold; color: var(--main-purple); margin: 20px 0 10px; display: flex; align-items: center; }
-        .section-title::before { content: "🌙"; margin-right: 8px; }
-
-        /* 照片上傳 */
+        .section-title { font-size: 15px; font-weight: bold; color: var(--main-purple); margin: 20px 0 10px; border-left: 4px solid var(--main-purple); padding-left: 10px; }
+        
+        /* 表單與標籤 */
         .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
         .photo-box { aspect-ratio: 1/1; background: #f0f1f5; border-radius: 12px; display: flex; justify-content: center; align-items: center; border: 2px dashed #ccc; cursor: pointer; overflow: hidden; font-size: 24px; color: #aaa; }
         .photo-box img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* 表單樣式 */
         .input-group { margin-bottom: 15px; }
         label { display: block; font-size: 13px; color: #666; margin-bottom: 5px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 14px; }
-        
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
         .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-        .tag-btn { background: white; border: 1px solid #ddd; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .tag-btn { background: white; border: 1px solid #ddd; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; }
         .tag-btn.active { background: var(--main-purple); color: white; border-color: var(--main-purple); }
-
-        .btn-primary { background: var(--main-purple); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-primary { background: var(--main-purple); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         
-        /* 星星評分 */
-        .stars { display: flex; justify-content: center; gap: 10px; font-size: 35px; margin: 25px 0; }
+        /* 配對頁面星星 */
+        .stars { display: flex; justify-content: center; gap: 10px; font-size: 35px; margin: 20px 0; }
         .star { color: #ddd; cursor: pointer; }
         .star.active { color: #ffa502; }
-
-        /* 配對成功覆蓋層 */
-        #match-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white; text-align: center; }
-        .match-card { background: white; color: #333; padding: 40px; border-radius: 30px; width: 80%; max-width: 320px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div id="page-edit" class="card">
-        <h2>個人資料編輯</h2>
+        <h2>編輯個人檔案</h2>
         <div class="section-title">公開照片</div>
         <div class="photo-grid">
             <div class="photo-box" onclick="triggerUpload(1)" id="box-1">+</div>
@@ -53,54 +44,36 @@
         <input type="file" id="file-input" hidden accept="image/*" onchange="handleFile(event)">
 
         <div class="section-title">關於我</div>
-        <div class="input-group"><label>暱稱</label><input type="text" id="nickname" placeholder="例如：冰山"></div>
-        <div class="input-group"><label>MBTI</label><select id="mbti"><option>INTP</option><option>ENFP</option><option>INTJ</option><option>INFJ</option><option>ENTP</option></select></div>
-        <div class="input-group"><label>職業</label><input type="text" id="job" placeholder="例如：白天自由業，晚上酒吧"></div>
+        <div class="input-group"><label>暱稱</label><input type="text" id="nickname" placeholder="例如：123"></div>
+        <div class="input-group"><label>MBTI</label><select id="mbti"><option>INTP</option><option>ENFP</option><option>INTJ</option><option>INFJ</option></select></div>
+        <div class="input-group"><label>職業</label><input type="text" id="job" placeholder="例如：工程師"></div>
         
         <div class="section-title">生活習慣</div>
         <div class="tag-group" data-type="habit">
             <div class="tag-btn" onclick="t(this)">不抽菸</div><div class="tag-btn" onclick="t(this)">偶爾喝酒</div><div class="tag-btn" onclick="t(this)">夜貓子</div><div class="tag-btn" onclick="t(this)">有運動習慣</div>
         </div>
 
-        <div class="section-title">運動類</div>
-        <div class="tag-group" data-type="sport">
-            <div class="tag-btn" onclick="t(this)">溜冰</div><div class="tag-btn" onclick="t(this)">乒乓球</div><div class="tag-btn" onclick="t(this)">射箭</div>
-        </div>
-
-        <div class="section-title">美食類</div>
-        <div class="tag-group" data-type="food">
-            <div class="tag-btn" onclick="t(this)">日式料理</div><div class="tag-btn" onclick="t(this)">韓式料理</div><div class="tag-btn" onclick="t(this)">義法料理</div>
-        </div>
-
-        <button class="btn-primary" onclick="saveAndStart()">儲存並開始配對</button>
+        <button class="btn-primary" onclick="saveAndGo()">儲存並尋找對象</button>
     </div>
 
     <div id="page-discovery" class="card" style="display:none;">
-        <h2 id="target-name">探索對象</h2>
-        <div id="target-photo" style="width:100%; aspect-ratio:1/1; background:#eee; border-radius:20px; margin-bottom:20px; display:flex; align-items:center; justify-content:center; font-size:60px;">👤</div>
-        <div id="target-bio" style="font-size: 14px; line-height: 1.6; color: #555;"></div>
-
+        <h2 id="target-name">尋找對象中...</h2>
+        <div id="target-display" style="font-size: 14px; line-height: 1.8;">
+            <div style="width:100%; aspect-ratio:1/1; background:#eee; border-radius:20px; margin-bottom:15px; display:flex; align-items:center; justify-content:center; font-size:50px;">👤</div>
+            <p id="target-detail">正在從雲端下載使用者資料...</p>
+        </div>
         <div class="stars">
             <span class="star" data-v="1">★</span><span class="star" data-v="2">★</span><span class="star" data-v="3">★</span><span class="star" data-v="4">★</span><span class="star" data-v="5">★</span>
         </div>
-        <button class="btn-primary" onclick="checkMatch()">送出評分</button>
-    </div>
-</div>
-
-<div id="match-overlay">
-    <div class="match-card">
-        <h1 style="color:var(--accent); margin:0;">It's a Match!</h1>
-        <p style="margin:20px 0; line-height:1.5;">恭喜！你們的好感度相加超過 5 顆星，配對成功！</p>
-        <p style="font-size:12px; color:#999;">(本站僅提供配對功能，不開放私訊聊天)</p>
-        <button class="btn-primary" onclick="location.reload()">繼續探索</button>
+        <button class="btn-primary" onclick="submitRating()">送出評分並看下一個</button>
     </div>
 </div>
 
 <script type="module">
-    // Firebase 初始化
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    // Firebase 配置
     const firebaseConfig = {
       apiKey: "AIzaSyDv4EOEmJ8dfWgZEv5mYtaiXuzbwgjMAUA",
       authDomain: "jariah-match.firebaseapp.com",
@@ -114,23 +87,23 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // 全域功能
-    window.t = (el) => el.classList.toggle('active');
-    let activeBox = 1;
+    let usersList = [];
+    let currentIndex = 0;
     let myScore = 0;
-    const fakeTargetScore = 3; // 模擬對象給你的分數
 
-    window.triggerUpload = (id) => { activeBox = id; document.getElementById('file-input').click(); };
+    window.t = (el) => el.classList.toggle('active');
+    window.triggerUpload = (id) => document.getElementById('file-input').click();
     window.handleFile = (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = (ev) => document.getElementById(`box-${activeBox}`).innerHTML = `<img src="${ev.target.result}">`;
+            reader.onload = (ev) => document.getElementById('box-1').innerHTML = `<img src="${ev.target.result}">`;
             reader.readAsDataURL(file);
         }
     };
 
-    window.saveAndStart = async () => {
+    // 儲存資料並進入探索頁面
+    window.saveAndGo = async () => {
         const name = document.getElementById('nickname').value;
         if(!name) return alert("請填寫暱稱");
 
@@ -139,22 +112,41 @@
             mbti: document.getElementById('mbti').value,
             job: document.getElementById('job').value,
             habits: Array.from(document.querySelectorAll('.tag-group[data-type="habit"] .active')).map(b => b.innerText),
-            sports: Array.from(document.querySelectorAll('.tag-group[data-type="sport"] .active')).map(b => b.innerText),
-            foods: Array.from(document.querySelectorAll('.tag-group[data-type="food"] .active')).map(b => b.innerText),
-            time: serverTimestamp()
+            createdAt: serverTimestamp()
         };
 
         try {
             await addDoc(collection(db, "users"), userData);
             document.getElementById('page-edit').style.display = 'none';
             document.getElementById('page-discovery').style.display = 'block';
-            loadTarget();
-        } catch (e) { alert("上傳失敗，請檢查 Firebase 設定"); }
+            fetchOtherUsers(name); // 傳入自己的名字以利排除
+        } catch (e) { alert("上傳失敗"); }
     };
 
-    function loadTarget() {
-        document.getElementById('target-name').innerText = "小美 (24歲)";
-        document.getElementById('target-bio').innerHTML = "<b>MBTI:</b> ENFP<br><b>職業:</b> 設計師<br><b>興趣:</b> 喜歡日式料理、滑板與貓。希望能遇到有趣的人！";
+    // 從資料庫抓取其他使用者
+    async function fetchOtherUsers(myCurrentName) {
+        const snap = await getDocs(collection(db, "users"));
+        usersList = [];
+        snap.forEach(doc => {
+            const data = doc.data();
+            if(data.name !== myCurrentName) usersList.push(data);
+        });
+        showNextUser();
+    }
+
+    function showNextUser() {
+        if(currentIndex >= usersList.length) {
+            document.getElementById('target-name').innerText = "已看完全部對象";
+            document.getElementById('target-detail').innerText = "目前沒有更多新的使用者了，請稍後再回來！";
+            return;
+        }
+        const u = usersList[currentIndex];
+        document.getElementById('target-name').innerText = `${u.name} (${u.mbti})`;
+        document.getElementById('target-detail').innerHTML = `
+            <b>職業：</b> ${u.job || '未填寫'} <br>
+            <b>生活習慣：</b> ${u.habits ? u.habits.join(', ') : '無'}
+        `;
+        resetStars();
     }
 
     const stars = document.querySelectorAll('.star');
@@ -163,13 +155,16 @@
         stars.forEach(st => st.classList.toggle('active', st.dataset.v <= myScore));
     });
 
-    window.checkMatch = () => {
-        if(myScore === 0) return alert("請評分");
-        if(myScore + fakeTargetScore >= 5) {
-            document.getElementById('match-overlay').style.display = 'flex';
-        } else {
-            alert(`目前總分 ${myScore + fakeTargetScore} 星，尚未配對成功。`);
-        }
+    function resetStars() {
+        myScore = 0;
+        stars.forEach(st => st.classList.remove('active'));
+    }
+
+    window.submitRating = () => {
+        if(myScore === 0) return alert("請給予評分");
+        alert(`你給了 ${usersList[currentIndex].name} ${myScore} 顆星！系統已記錄。`);
+        currentIndex++;
+        showNextUser();
     };
 </script>
 
