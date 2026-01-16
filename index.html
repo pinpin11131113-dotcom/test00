@@ -70,102 +70,94 @@
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    // 1. 引入 Storage 功能
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-    // Firebase 配置
-    const firebaseConfig = {
-      apiKey: "AIzaSyDv4EOEmJ8dfWgZEv5mYtaiXuzbwgjMAUA",
-      authDomain: "jariah-match.firebaseapp.com",
-      projectId: "jariah-match",
-      storageBucket: "jariah-match.firebasestorage.app",
-      messagingSenderId: "863372390147",
-      appId: "1:863372390147:web:7541b1b478c33f3d824336",
-      measurementId: "G-GDNBERRJJ1"
-    };
+// 2. Firebase 配置 (保持不變)
+const firebaseConfig = {
+  apiKey: "AIzaSyDv4EOEmJ8dfWgZEv5mYtaiXuzbwgjMAUA",
+  authDomain: "jariah-match.firebaseapp.com",
+  projectId: "jariah-match",
+  storageBucket: "jariah-match.firebasestorage.app",
+  messagingSenderId: "863372390147",
+  appId: "1:863372390147:web:7541b1b478c33f3d824336",
+  measurementId: "G-GDNBERRJJ1"
+};
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app); // 初始化儲存空間
 
-    let usersList = [];
-    let currentIndex = 0;
-    let myScore = 0;
+let selectedFile = null;
 
-    window.t = (el) => el.classList.toggle('active');
-    window.triggerUpload = (id) => document.getElementById('file-input').click();
-    window.handleFile = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (ev) => document.getElementById('box-1').innerHTML = `<img src="${ev.target.result}">`;
-            reader.readAsDataURL(file);
-        }
-    };
+// 3. 處理照片選取與預覽
+window.handleFile = (e) => {
+    selectedFile = e.target.files[0];
+    if (selectedFile) {
+        const reader = new FileReader();
+        reader.onload = (ev) => document.getElementById('box-1').innerHTML = `<img src="${ev.target.result}" style="width:100%">`;
+        reader.readAsDataURL(selectedFile);
+    }
+};
 
-    // 儲存資料並進入探索頁面
-    window.saveAndGo = async () => {
-        const name = document.getElementById('nickname').value;
-        if(!name) return alert("請填寫暱稱");
+// 4. 修改儲存邏輯：先傳照片，再傳資料
+window.saveAndGo = async () => {
+    const name = document.getElementById('nickname').value;
+    if(!name || !selectedFile) return alert("請填寫暱稱並上傳一張封面照片！");
 
+    try {
+        // A. 上傳照片到雲端
+        const storageRef = ref(storage, 'user_photos/' + name + "_" + Date.now());
+        const snapshot = await uploadBytes(storageRef, selectedFile);
+        const photoUrl = await getDownloadURL(snapshot.ref);
+
+        // B. 將資料連同照片網址存入資料庫
         const userData = {
             name: name,
+            photoUrl: photoUrl, // 這裡存的是雲端圖片的網址
             mbti: document.getElementById('mbti').value,
             job: document.getElementById('job').value,
             habits: Array.from(document.querySelectorAll('.tag-group[data-type="habit"] .active')).map(b => b.innerText),
             createdAt: serverTimestamp()
         };
 
-        try {
-            await addDoc(collection(db, "users"), userData);
-            document.getElementById('page-edit').style.display = 'none';
-            document.getElementById('page-discovery').style.display = 'block';
-            fetchOtherUsers(name); // 傳入自己的名字以利排除
-        } catch (e) { alert("上傳失敗"); }
-    };
+        await addDoc(collection(db, "users"), userData);
+        alert("個人資料與照片已成功上傳！");
+        
+        document.getElementById('page-edit').style.display = 'none';
+        document.getElementById('page-discovery').style.display = 'block';
+        fetchOtherUsers(name);
+    } catch (e) { 
+        console.error(e);
+        alert("上傳失敗，請確認 Storage 權限已開啟為測試模式"); 
+    }
+};
 
-    // 從資料庫抓取其他使用者
-    async function fetchOtherUsers(myCurrentName) {
-        const snap = await getDocs(collection(db, "users"));
-        usersList = [];
-        snap.forEach(doc => {
-            const data = doc.data();
-            if(data.name !== myCurrentName) usersList.push(data);
-        });
-        showNextUser();
+// 5. 修改顯示邏輯：讀取雲端照片網址
+function showNextUser() {
+    if(currentIndex >= usersList.length) {
+        document.getElementById('target-name').innerText = "已看完全部對象";
+        document.getElementById('target-detail').innerText = "暫無更多使用者。";
+        return;
+    }
+    const u = usersList[currentIndex];
+    document.getElementById('target-name').innerText = `${u.name} (${u.mbti})`;
+    
+    // 顯示對方的雲端照片
+    const photoContainer = document.getElementById('target-display').querySelector('div');
+    if(u.photoUrl) {
+        photoContainer.innerHTML = `<img src="${u.photoUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:20px;">`;
+    } else {
+        photoContainer.innerHTML = "👤";
     }
 
-    function showNextUser() {
-        if(currentIndex >= usersList.length) {
-            document.getElementById('target-name').innerText = "已看完全部對象";
-            document.getElementById('target-detail').innerText = "目前沒有更多新的使用者了，請稍後再回來！";
-            return;
-        }
-        const u = usersList[currentIndex];
-        document.getElementById('target-name').innerText = `${u.name} (${u.mbti})`;
-        document.getElementById('target-detail').innerHTML = `
-            <b>職業：</b> ${u.job || '未填寫'} <br>
-            <b>生活習慣：</b> ${u.habits ? u.habits.join(', ') : '無'}
-        `;
-        resetStars();
-    }
-
-    const stars = document.querySelectorAll('.star');
-    stars.forEach(s => s.onclick = () => {
-        myScore = parseInt(s.dataset.v);
-        stars.forEach(st => st.classList.toggle('active', st.dataset.v <= myScore));
-    });
-
-    function resetStars() {
-        myScore = 0;
-        stars.forEach(st => st.classList.remove('active'));
-    }
-
-    window.submitRating = () => {
-        if(myScore === 0) return alert("請給予評分");
-        alert(`你給了 ${usersList[currentIndex].name} ${myScore} 顆星！系統已記錄。`);
-        currentIndex++;
-        showNextUser();
-    };
+    document.getElementById('target-detail').innerHTML = `
+        <b>職業：</b> ${u.job || '未填寫'} <br>
+        <b>生活習慣：</b> ${u.habits ? u.habits.join(', ') : '無'}
+    `;
+}
 </script>
 
 </body>
