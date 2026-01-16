@@ -3,63 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jariah 報名系統 - 穩定版</title>
+    <title>Jariah 聯誼報名系統</title>
     <style>
-        :root { --main-p: #764ba2; --bg: #ecedf2; }
+        :root { --main-p: #764ba2; --bg: #f0f2f5; }
         body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
-        .card { background: white; border-radius: 20px; padding: 20px; width: 100%; max-width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .section-title { font-size: 14px; font-weight: bold; color: var(--main-p); margin: 15px 0 8px; border-left: 4px solid var(--main-p); padding-left: 10px; }
-        .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .photo-box { aspect-ratio: 1/1; background: #f0f1f5; border-radius: 10px; display: flex; justify-content: center; align-items: center; border: 2px dashed #ccc; cursor: pointer; overflow: hidden; font-size: 20px; color: #aaa; }
+        .card { background: white; border-radius: 20px; padding: 25px; width: 100%; max-width: 450px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .section-title { font-size: 15px; font-weight: bold; color: var(--main-p); margin: 20px 0 10px; border-left: 5px solid var(--main-p); padding-left: 10px; }
+        .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .photo-box { aspect-ratio: 1/1; background: #f8f9fa; border-radius: 12px; display: flex; justify-content: center; align-items: center; border: 2px dashed #ddd; cursor: pointer; overflow: hidden; font-size: 24px; color: #ccc; }
         .photo-box img { width: 100%; height: 100%; object-fit: cover; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; box-sizing: border-box; }
-        .tag-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
-        .tag-btn { background: #f0f1f5; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; }
+        .btn-p { background: var(--main-p); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .tag-btn { background: #eee; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; }
         .tag-btn.active { background: var(--main-p); color: white; }
-        .btn-p { background: var(--main-p); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-weight: bold; cursor: pointer; }
-        .stars { display: flex; justify-content: center; gap: 10px; font-size: 35px; margin: 20px 0; }
-        .star { color: #ddd; cursor: pointer; }
-        .star.active { color: #ffa502; }
     </style>
 </head>
 <body>
 <div class="card" id="pe">
     <h2 style="text-align:center;">活動報名</h2>
-    <div class="section-title">生活照 (點擊上傳三張)</div>
+    <div class="section-title">生活照 (請點擊上傳三張)</div>
     <div class="photo-grid">
         <div class="photo-box" onclick="aid=1;f().click()" id="b-1">+</div>
         <div class="photo-box" onclick="aid=2;f().click()" id="b-2">+</div>
         <div class="photo-box" onclick="aid=3;f().click()" id="b-3">+</div>
     </div>
     <input type="file" id="fi" hidden accept="image/*" onchange="h(event)">
+    
     <div class="section-title">資本資料</div>
-    <input type="text" id="nn" placeholder="暱稱">
-    <input type="tel" id="ph" placeholder="手機號碼 (主辦聯繫用)">
-    <select id="mb"><option>INTP</option><option>ENFP</option><option>INTJ</option><option>INFJ</option><option>ENTP</option></select>
-    <input type="text" id="jb" placeholder="職業">
+    <input type="text" id="nn" placeholder="暱稱 (如：冰山)">
+    <input type="tel" id="ph" placeholder="手機號碼 (僅供主辦聯繫)">
+    <select id="mb"><option>INTP</option><option>ENFP</option><option>INTJ</option><option>INFJ</option></select>
+    <input type="text" id="jb" placeholder="目前職業">
+
     <div class="section-title">生活習慣</div>
     <div class="tag-group" id="ha">
         <span class="tag-btn" onclick="this.classList.toggle('active')">不抽菸</span>
         <span class="tag-btn" onclick="this.classList.toggle('active')">偶爾喝酒</span>
         <span class="tag-btn" onclick="this.classList.toggle('active')">夜貓子</span>
     </div>
-    <button class="btn-p" onclick="sv()">完成報名並開始配對</button>
-</div>
-
-<div class="card" id="pd" style="display:none;">
-    <h2 id="tn">探索中...</h2>
-    <div id="tc" style="display:flex; gap:8px; overflow-x:auto; margin-bottom:15px; height:150px;"></div>
-    <p id="td" style="font-size:14px; line-height:1.6;"></p>
-    <div class="stars"><span class="star" data-v="1">★</span><span class="star" data-v="2">★</span><span class="star" data-v="3">★</span><span class="star" data-v="4">★</span><span class="star" data-v="5">★</span></div>
-    <button class="btn-p" onclick="rt()">送出評分</button>
+    <button class="btn-p" onclick="sv()">儲存並開始配對</button>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     const cfg = { apiKey: "AIzaSyDv4EOEmJ8dfWgZEv5mYtaiXuzbwgjMAUA", authDomain: "jariah-match.firebaseapp.com", projectId: "jariah-match", storageBucket: "jariah-match.firebasestorage.app", messagingSenderId: "863372390147", appId: "1:863372390147:web:7541b1b478c33f3d824336" };
     const app = initializeApp(cfg); const db = getFirestore(app);
-    let aid=1, pts=["","",""], mN="", us=[], cur=0, sc=0;
+    let aid=1, pts=["","",""], mN="";
     window.f=()=>document.getElementById('fi');
     window.h=(e)=>{
         const file=e.target.files[0];
@@ -69,12 +60,12 @@
                 const img=new Image();
                 img.onload=()=>{
                     const cvs=document.createElement('canvas');
-                    let w=img.width, h=img.height, max=800;
-                    if(w>h){if(w>max){h*=max/w;w=max;}}else{if(h>max){w*=max/h;h=max;}}
+                    let w=img.width, h=img.height, max=500; // 壓縮至 500px 確保三張圖都能存
+                    if(w>h){if(w>max){h*=max/w;w=max;}}else{if(h>max){width*=max/h;h=max;}}
                     cvs.width=w;cvs.height=h;
                     const ctx=cvs.getContext('2d'); ctx.drawImage(img,0,0,w,h);
-                    const b64=cvs.toDataURL('image/jpeg',0.7);
-                    pts[aid-1]=b64; document.getElementById(`b-${aid}`).innerHTML=`<img src="${b64}">`;
+                    pts[aid-1]=cvs.toDataURL('image/jpeg', 0.6); // 降低品質以節省空間
+                    document.getElementById(`b-${aid}`).innerHTML=`<img src="${pts[aid-1]}">`;
                 };
                 img.src=ev.target.result;
             };
@@ -83,30 +74,11 @@
     };
     window.sv=async()=>{
         mN=document.getElementById('nn').value; const ph=document.getElementById('ph').value;
-        if(!mN || !ph || !pts[0]) return alert("請填寫名字、電話與至少一張照片");
+        if(!mN || !ph || !pts[0]) return alert("請完整填寫並至少上傳一張封面照");
         try{
             await addDoc(collection(db, "users"), { name:mN, phone:ph, photos:pts, mbti:document.getElementById('mb').value, job:document.getElementById('jb').value, habits:Array.from(document.querySelectorAll('#ha .active')).map(t=>t.innerText), createdAt:serverTimestamp() });
-            document.getElementById('pe').style.display='none'; document.getElementById('pd').style.display='block';
-            const snap=await getDocs(collection(db, "users"));
-            snap.forEach(d=>{ if(d.data().name!==mN) us.push(d.data()); });
-            show();
-        }catch(e){ alert("系統忙碌中，請確認 Firebase 規則已開啟！"); }
-    };
-    function show(){
-        if(cur>=us.length){ document.getElementById('tn').innerText="已看完全部對象"; return; }
-        const u=us[cur]; document.getElementById('tn').innerText=u.name;
-        document.getElementById('tc').innerHTML=u.photos.filter(p=>p).map(p=>`<img src="${p}" style="height:150px; border-radius:10px;">`).join('');
-        document.getElementById('td').innerHTML=`<b>MBTI:</b> ${u.mbti} | <b>職業:</b> ${u.job}<br><b>習慣:</b> ${u.habits.join(', ')}`;
-    }
-    document.querySelectorAll('.star').forEach(s=>s.onclick=()=>{
-        sc=parseInt(s.dataset.v);
-        document.querySelectorAll('.star').forEach(st=>st.classList.toggle('active', st.dataset.v<=sc));
-    });
-    window.rt=async()=>{
-        if(sc===0) return alert("請給分");
-        if(sc>=4) await addDoc(collection(db, "matches"), { pair:[mN, us[cur].name], score:sc, time:serverTimestamp() });
-        alert("評分成功！"); cur++; show(); sc=0;
-        document.querySelectorAll('.star').forEach(st=>st.classList.remove('active'));
+            alert("報名成功！"); location.reload(); // 測試期先重新整理
+        } catch(e) { console.error(e); alert("系統忙碌，請嘗試上傳較小的照片"); }
     };
 </script>
 </body>
