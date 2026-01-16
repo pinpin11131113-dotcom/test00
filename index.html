@@ -95,56 +95,51 @@
     };
 
     // 照片強力壓縮邏輯
-    window.handleFile = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const r = new FileReader();
-            r.onload = (ev) => {
-                const img = new Image();
-                img.onload = () => {
-                    const cvs = document.createElement('canvas');
-                    let w = img.width, h = img.height, max = 500; // 限制解析度
-                    if (w > h) { if (w > max) { h *= max / w; w = max; } } else { if (h > max) { w *= max / h; h = max; } }
-                    cvs.width = w; cvs.height = h;
-                    const ctx = cvs.getContext('2d');
-                    ctx.drawImage(img, 0, 0, w, h);
-                    
-                    // 壓縮品質調低確保 3 張能存入
-                    const b64 = cvs.toDataURL('image/jpeg', 0.5);
-                    pts[curId - 1] = b64;
-                    document.getElementById(`b-${curId}`).innerHTML = `<img src="${b64}">`;
-                    e.target.value = ""; // 重設選取器
-                };
-                img.src = ev.target.result;
+// ... (Firebase 初始化保持不變) ...
+
+window.handleFile = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                // 將最大寬度降至 400px，確保 3 張圖加起來不超過 1MB
+                let w = img.width, h = img.height, max = 400; 
+                if (w > h) { if (w > max) { h *= max / w; w = max; } }
+                else { if (h > max) { w *= max / h; h = max; } }
+                canvas.width = w; canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                // 壓縮品質降至 0.3 (強力壓縮)
+                const b64 = canvas.toDataURL('image/jpeg', 0.3); 
+                pts[currentAid - 1] = b64;
+                document.getElementById(`b-${currentAid}`).innerHTML = `<img src="${b64}">`;
+                e.target.value = ""; 
             };
-            reader.readAsDataURL(file);
-        }
-    };
+            img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+};
 
-    window.saveData = async () => {
-        myName = document.getElementById('nn').value;
-        const phone = document.getElementById('ph').value;
-        if(!myName || !phone || !pts[0]) return alert("請填寫名字、電話並至少傳第一張封面照");
+window.saveData = async () => {
+    // ... (檢查必填欄位邏輯) ...
+    try {
+        await addDoc(collection(db, "users"), { /* 儲存內容 */ });
+        alert("🎉 報名成功！");
+        location.reload(); 
+    } catch(e) {
+        // --- 顯示真正的錯誤代碼 ---
+        let msg = "系統忙碌中";
+        if (e.code === 'permission-denied') msg = "【權限不足】規則發布可能尚未生效，請等 30 秒後重試。";
+        else if (e.message.includes('exceeds')) msg = "【照片還是太大】即便壓縮後仍超過 1MB，請換一張截圖測試。";
         
-        try {
-            await addDoc(collection(db, "users"), {
-                name: myName, phone: phone, photos: pts, mbti: document.getElementById('mb').value,
-                job: document.getElementById('jb').value, habits: Array.from(document.querySelectorAll('#ha .active')).map(t=>t.innerText),
-                createdAt: serverTimestamp()
-            });
-            alert("🎉 報名成功！開始配對探索。");
-            document.getElementById('page-edit').style.display = 'none';
-            document.getElementById('page-discovery').style.display = 'block';
-            fetchUsers();
-        } catch(e) {
-            // 中文錯誤轉譯
-            let msg = "系統忙碌中";
-            if (e.code === 'permission-denied') msg = "【權限不足】請檢查 Firebase 規則是否發布為 true";
-            else if (e.message.includes('exceeds')) msg = "【照片太大】請嘗試使用螢幕截圖上傳";
-            alert("❌ 提交失敗！\n原因：" + msg);
-        }
-    };
-
+        alert("❌ 失敗原因：" + msg + "\n\n詳細代碼：" + e.message);
+        console.error(e);
+    }
+};
     async function fetchUsers() {
         const snap = await getDocs(collection(db, "users"));
         users = [];
