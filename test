@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jariah 星星配對網站</title>
+    <style>
+        :root {
+            --primary-color: #ff4757;
+            --star-color: #ffa502;
+        }
+        body {
+            font-family: 'PingFang TC', sans-serif;
+            background-color: #f1f2f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 350px;
+            text-align: center;
+        }
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #dfe4ea;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+        }
+        h2 { margin: 10px 0; color: #2f3542; }
+        p { color: #747d8c; font-size: 14px; margin-bottom: 25px; }
+        
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            font-size: 35px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .star { color: #ccc; transition: 0.2s; }
+        .star.active { color: var(--star-color); }
+        .star:hover { transform: scale(1.2); }
+
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        #result-message {
+            margin-top: 20px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 10px;
+            display: none;
+        }
+        .match-success { background: #e3fcef; color: #00b894; }
+        .match-fail { background: #fff5f5; color: #ff4757; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="profile-pic">👤</div>
+    <h2 id="name-display">正在載入對象...</h2>
+    <p id="bio-display">加載基本資料中...</p>
+    
+    <div class="stars" id="star-container">
+        <span class="star" data-value="1">★</span>
+        <span class="star" data-value="2">★</span>
+        <span class="star" data-value="3">★</span>
+        <span class="star" data-value="4">★</span>
+        <span class="star" data-value="5">★</span>
+    </div>
+    
+    <button onclick="submitRating()">送出評分</button>
+    <div id="result-message"></div>
+</div>
+
+<script>
+    let currentRating = 0;
+    // 模擬對象：假設對象已經給了你 3 顆星
+    const targetUserRatingToMe = 3; 
+
+    // 星星點擊邏輯
+    const stars = document.querySelectorAll('.star');
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            currentRating = parseInt(star.getAttribute('data-value'));
+            updateStars();
+        });
+    });
+
+    function updateStars() {
+        stars.forEach(star => {
+            const val = parseInt(star.getAttribute('data-value'));
+            star.classList.toggle('active', val <= currentRating);
+        });
+    }
+
+    // 模擬載入對象
+    setTimeout(() => {
+        document.getElementById('name-display').innerText = "小明 (28歲)";
+        document.getElementById('bio-display').innerText = "創業中，喜歡攝影與旅行。希望能遇到價值觀相近的人！";
+    }, 500);
+
+    // 配對邏輯：相加 >= 5 則成功
+    function submitRating() {
+        if (currentRating === 0) {
+            alert("請先選擇星星評分！");
+            return;
+        }
+
+        const total = currentRating + targetUserRatingToMe;
+        const resultDiv = document.getElementById('result-message');
+        resultDiv.style.display = 'block';
+
+        if (total >= 5) {
+            resultDiv.className = 'match-success';
+            resultDiv.innerHTML = `🎉 配對成功！<br>你給了 ${currentRating} 星，對方給了 ${targetUserRatingToMe} 星。<br>總分 ${total} 分，可以開始聊天了！`;
+        } else {
+            resultDiv.className = 'match-fail';
+            resultDiv.innerHTML = `⌛ 尚未配對。<br>總分 ${total} 分，還差一點點！`;
+        }
+    }
+</script>
+
+</body>
+</html>
