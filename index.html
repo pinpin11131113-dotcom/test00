@@ -9,23 +9,24 @@
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
         .app-container { width: 100%; max-width: 450px; }
         .card { background: white; border-radius: 25px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h2 { text-align: center; color: #333; margin-top: 0; }
-        .section-title { font-size: 15px; font-weight: bold; color: var(--main-purple); margin: 20px 0 10px; border-left: 4px solid var(--main-purple); padding-left: 10px; }
+        h2 { text-align: center; color: #333; margin-top: 0; font-size: 20px; }
+        .section-title { font-size: 14px; font-weight: bold; color: var(--main-purple); margin: 18px 0 8px; border-left: 4px solid var(--main-purple); padding-left: 10px; }
         
-        /* 表單與標籤 */
-        .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .photo-box { aspect-ratio: 1/1; background: #f0f1f5; border-radius: 12px; display: flex; justify-content: center; align-items: center; border: 2px dashed #ccc; cursor: pointer; overflow: hidden; font-size: 24px; color: #aaa; }
+        /* 照片上傳樣式 */
+        .photo-box { width: 120px; height: 120px; background: #f0f1f5; border-radius: 15px; display: flex; justify-content: center; align-items: center; border: 2px dashed #ccc; cursor: pointer; overflow: hidden; margin: 0 auto 10px; }
         .photo-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 表單樣式 */
         .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 13px; color: #666; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
-        .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 14px; }
+        .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
         .tag-btn { background: white; border: 1px solid #ddd; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; }
         .tag-btn.active { background: var(--main-purple); color: white; border-color: var(--main-purple); }
-        .btn-primary { background: var(--main-purple); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-primary { background: var(--main-purple); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; }
         
-        /* 配對頁面星星 */
-        .stars { display: flex; justify-content: center; gap: 10px; font-size: 35px; margin: 20px 0; }
+        /* 探索頁面星星 */
+        .stars { display: flex; justify-content: center; gap: 12px; font-size: 35px; margin: 20px 0; }
         .star { color: #ddd; cursor: pointer; }
         .star.active { color: #ffa502; }
     </style>
@@ -34,130 +35,167 @@
 
 <div class="app-container">
     <div id="page-edit" class="card">
-        <h2>編輯個人檔案</h2>
-        <div class="section-title">公開照片</div>
-        <div class="photo-grid">
-            <div class="photo-box" onclick="triggerUpload(1)" id="box-1">+</div>
-            <div class="photo-box" onclick="triggerUpload(2)" id="box-2">+</div>
-            <div class="photo-box" onclick="triggerUpload(3)" id="box-3">+</div>
-        </div>
+        <h2>聯誼活動報名</h2>
+        <div class="section-title">上傳封面照片 (建議小於 1MB)</div>
+        <div class="photo-box" onclick="document.getElementById('file-input').click()" id="box-1">+</div>
         <input type="file" id="file-input" hidden accept="image/*" onchange="handleFile(event)">
 
-        <div class="section-title">關於我</div>
-        <div class="input-group"><label>暱稱</label><input type="text" id="nickname" placeholder="例如：123"></div>
+        <div class="section-title">基本資料 (公開)</div>
+        <div class="input-group"><label>暱稱</label><input type="text" id="nickname" placeholder="例如：冰山"></div>
         <div class="input-group"><label>MBTI</label><select id="mbti"><option>INTP</option><option>ENFP</option><option>INTJ</option><option>INFJ</option></select></div>
-        <div class="input-group"><label>職業</label><input type="text" id="job" placeholder="例如：工程師"></div>
+        <div class="input-group"><label>職業</label><input type="text" id="job" placeholder="例如：自由業"></div>
         
-        <div class="section-title">生活習慣</div>
+        <div class="section-title">聯絡資訊 (僅供主辦方聯繫，不公開)</div>
+        <div class="input-group"><label>手機號碼</label><input type="tel" id="user-phone" placeholder="例如：0912345678"></div>
+
+        <div class="section-title">生活習慣 (公開)</div>
         <div class="tag-group" data-type="habit">
             <div class="tag-btn" onclick="t(this)">不抽菸</div><div class="tag-btn" onclick="t(this)">偶爾喝酒</div><div class="tag-btn" onclick="t(this)">夜貓子</div><div class="tag-btn" onclick="t(this)">有運動習慣</div>
         </div>
 
-        <button class="btn-primary" onclick="saveAndGo()">儲存並尋找對象</button>
+        <button class="btn-primary" onclick="saveAndGo()">完成報名並開始配對</button>
     </div>
 
     <div id="page-discovery" class="card" style="display:none;">
         <h2 id="target-name">尋找對象中...</h2>
-        <div id="target-display" style="font-size: 14px; line-height: 1.8;">
-            <div style="width:100%; aspect-ratio:1/1; background:#eee; border-radius:20px; margin-bottom:15px; display:flex; align-items:center; justify-content:center; font-size:50px;">👤</div>
-            <p id="target-detail">正在從雲端下載使用者資料...</p>
+        <div id="target-display">
+            <div id="target-img-container" style="width:100%; aspect-ratio:1/1; background:#eee; border-radius:20px; margin-bottom:15px; display:flex; align-items:center; justify-content:center; overflow:hidden;">👤</div>
+            <div id="target-detail" style="font-size: 14px; line-height: 1.8; color: #444;"></div>
         </div>
         <div class="stars">
             <span class="star" data-v="1">★</span><span class="star" data-v="2">★</span><span class="star" data-v="3">★</span><span class="star" data-v="4">★</span><span class="star" data-v="5">★</span>
         </div>
-        <button class="btn-primary" onclick="submitRating()">送出評分並看下一個</button>
+        <button class="btn-primary" onclick="submitRating()">送出評分</button>
+        <p style="text-align:center; font-size:12px; color:#999; margin-top:15px;">※ 雙方皆給高分時，主辦方將於活動當天安排同桌</p>
     </div>
 </div>
 
 <script type="module">
-    // 1. 引入 Storage 功能
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// 2. Firebase 配置 (保持不變)
-const firebaseConfig = {
-  apiKey: "AIzaSyDv4EOEmJ8dfWgZEv5mYtaiXuzbwgjMAUA",
-  authDomain: "jariah-match.firebaseapp.com",
-  projectId: "jariah-match",
-  storageBucket: "jariah-match.firebasestorage.app",
-  messagingSenderId: "863372390147",
-  appId: "1:863372390147:web:7541b1b478c33f3d824336",
-  measurementId: "G-GDNBERRJJ1"
-};
+    // Firebase 配置
+    const firebaseConfig = {
+      apiKey: "AIzaSyDv4EOEmJ8dfWgZEv5mYtaiXuzbwgjMAUA",
+      authDomain: "jariah-match.firebaseapp.com",
+      projectId: "jariah-match",
+      storageBucket: "jariah-match.firebasestorage.app",
+      messagingSenderId: "863372390147",
+      appId: "1:863372390147:web:7541b1b478c33f3d824336",
+      measurementId: "G-GDNBERRJJ1"
+    };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app); // 初始化儲存空間
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-let selectedFile = null;
+    let usersList = [];
+    let currentIndex = 0;
+    let myScore = 0;
+    let photoBase64 = "";
+    let myName = "";
 
-// 3. 處理照片選取與預覽
-window.handleFile = (e) => {
-    selectedFile = e.target.files[0];
-    if (selectedFile) {
-        const reader = new FileReader();
-        reader.onload = (ev) => document.getElementById('box-1').innerHTML = `<img src="${ev.target.result}" style="width:100%">`;
-        reader.readAsDataURL(selectedFile);
-    }
-};
+    window.t = (el) => el.classList.toggle('active');
 
-// 4. 修改儲存邏輯：先傳照片，再傳資料
-window.saveAndGo = async () => {
-    const name = document.getElementById('nickname').value;
-    if(!name || !selectedFile) return alert("請填寫暱稱並上傳一張封面照片！");
+    // 照片處理
+    window.handleFile = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 1048576) return alert("照片太大囉！請選小於 1MB 的檔案。");
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                photoBase64 = ev.target.result;
+                document.getElementById('box-1').innerHTML = `<img src="${photoBase64}">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
-    try {
-        // A. 上傳照片到雲端
-        const storageRef = ref(storage, 'user_photos/' + name + "_" + Date.now());
-        const snapshot = await uploadBytes(storageRef, selectedFile);
-        const photoUrl = await getDownloadURL(snapshot.ref);
+    // 儲存資料並開始
+    window.saveAndGo = async () => {
+        myName = document.getElementById('nickname').value;
+        const phone = document.getElementById('user-phone').value;
+        if(!myName || !phone || !photoBase64) return alert("請填寫暱稱、電話並上傳照片！");
 
-        // B. 將資料連同照片網址存入資料庫
         const userData = {
-            name: name,
-            photoUrl: photoUrl, // 這裡存的是雲端圖片的網址
+            name: myName,
+            phone: phone, // 電話僅存入後台，前端不讀取
+            photoUrl: photoBase64,
             mbti: document.getElementById('mbti').value,
             job: document.getElementById('job').value,
             habits: Array.from(document.querySelectorAll('.tag-group[data-type="habit"] .active')).map(b => b.innerText),
             createdAt: serverTimestamp()
         };
 
-        await addDoc(collection(db, "users"), userData);
-        alert("個人資料與照片已成功上傳！");
+        try {
+            await addDoc(collection(db, "users"), userData);
+            alert("報名成功！即將開始探索對象。");
+            document.getElementById('page-edit').style.display = 'none';
+            document.getElementById('page-discovery').style.display = 'block';
+            fetchUsers();
+        } catch (e) { alert("系統忙碌中，請稍後再試。"); }
+    };
+
+    // 抓取其他參加者資料
+    async function fetchUsers() {
+        const snap = await getDocs(collection(db, "users"));
+        usersList = [];
+        snap.forEach(doc => {
+            const data = doc.data();
+            if(data.name !== myName) usersList.push(data);
+        });
+        showUser();
+    }
+
+    function showUser() {
+        if(currentIndex >= usersList.length) {
+            document.getElementById('target-name').innerText = "已看完全部對象";
+            document.getElementById('target-detail').innerHTML = "目前沒有更多新報名者，請稍後再回來查看！";
+            document.getElementById('target-img-container').innerHTML = "👤";
+            return;
+        }
+        const u = usersList[currentIndex];
+        document.getElementById('target-name').innerText = `${u.name} (${u.mbti})`;
+        document.getElementById('target-img-container').innerHTML = `<img src="${u.photoUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+        document.getElementById('target-detail').innerHTML = `
+            <b>職業：</b> ${u.job || '未填寫'} <br>
+            <b>生活習慣：</b> ${u.habits ? u.habits.join(', ') : '無'}
+        `;
+        resetStars();
+    }
+
+    // 星星邏輯
+    const stars = document.querySelectorAll('.star');
+    stars.forEach(s => s.onclick = () => {
+        myScore = parseInt(s.dataset.v);
+        stars.forEach(st => st.classList.toggle('active', st.dataset.v <= myScore));
+    });
+
+    function resetStars() {
+        myScore = 0;
+        stars.forEach(st => st.classList.remove('active'));
+    }
+
+    // 送出評分並記錄到後台
+    window.submitRating = async () => {
+        if(myScore === 0) return alert("請點擊星星給予評分");
         
-        document.getElementById('page-edit').style.display = 'none';
-        document.getElementById('page-discovery').style.display = 'block';
-        fetchOtherUsers(name);
-    } catch (e) { 
-        console.error(e);
-        alert("上傳失敗，請確認 Storage 權限已開啟為測試模式"); 
-    }
-};
+        const target = usersList[currentIndex];
+        
+        // 如果給 4 星以上，直接寫入配對資料夾給管理者看
+        if(myScore >= 4) {
+            try {
+                await addDoc(collection(db, "matches"), {
+                    pair: [myName, target.name],
+                    score: myScore,
+                    matchDate: serverTimestamp()
+                });
+            } catch (e) { console.log(e); }
+        }
 
-// 5. 修改顯示邏輯：讀取雲端照片網址
-function showNextUser() {
-    if(currentIndex >= usersList.length) {
-        document.getElementById('target-name').innerText = "已看完全部對象";
-        document.getElementById('target-detail').innerText = "暫無更多使用者。";
-        return;
-    }
-    const u = usersList[currentIndex];
-    document.getElementById('target-name').innerText = `${u.name} (${u.mbti})`;
-    
-    // 顯示對方的雲端照片
-    const photoContainer = document.getElementById('target-display').querySelector('div');
-    if(u.photoUrl) {
-        photoContainer.innerHTML = `<img src="${u.photoUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:20px;">`;
-    } else {
-        photoContainer.innerHTML = "👤";
-    }
-
-    document.getElementById('target-detail').innerHTML = `
-        <b>職業：</b> ${u.job || '未填寫'} <br>
-        <b>生活習慣：</b> ${u.habits ? u.habits.join(', ') : '無'}
-    `;
-}
+        alert(`已記錄你對 ${target.name} 的評分！`);
+        currentIndex++;
+        showUser();
+    };
 </script>
 
 </body>
