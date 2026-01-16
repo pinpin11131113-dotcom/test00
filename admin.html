@@ -2,63 +2,136 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>Jariah 後台 - Excel 匯出版</title>
+    <title>Jariah 活動管理後台 - 精準配對版</title>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f7f6; }
-        .btn { padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; }
-        .btn-excel { background: #27ae60; color: white; margin-right: 10px; }
-        table { width: 100%; background: white; border-collapse: collapse; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        body { font-family: sans-serif; padding: 20px; background: #f0f2f5; color: #333; }
+        .container { max-width: 1000px; margin: auto; }
+        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        h2 { color: #764ba2; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+        /* 配對區樣式 */
+        .match-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 6px solid #ff4757; background: #fff5f6; }
+        .top-match { border-left-color: #ffa502; background: #fffaf0; } /* 高分組合樣式 */
+        .score-badge { background: #ff4757; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; }
+        .names { font-size: 18px; font-weight: bold; }
+        
+        /* 表格樣式 */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: #764ba2; color: white; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; }
+        .btn-excel { background: #27ae60; color: white; }
     </style>
 </head>
 <body>
-    <h1>活動管理後台</h1>
-    <button class="btn btn-excel" onclick="exportData()">📊 匯出 Excel 名單</button>
-    <button class="btn" onclick="location.reload()">重新整理</button>
+<div class="container">
+    <h1>Jariah 精準配對後台</h1>
+    <button class="btn btn-excel" onclick="exportData()">📊 匯出今日 Excel 名冊</button>
+    <button class="btn" onclick="location.reload()">🔄 重新整理資料</button>
 
-    <h2>參加者資料</h2>
-    <table id="tbl">
-        <thead><tr><th>照片</th><th>暱稱</th><th>手機</th><th>MBTI</th><th>職業</th></tr></thead>
-        <tbody id="ub"></tbody>
-    </table>
+    <div class="card">
+        <h2>🔥 優先配對組合 (合計星星最高)</h2>
+        <div id="top-matches-list">正在計算最佳組合...</div>
+    </div>
 
-    <h2>成功配對紀錄</h2>
-    <div id="ml" style="margin-top:20px; background:white; padding:15px; border-radius:10px;">正在讀取紀錄...</div>
+    <div class="card">
+        <h2>📝 其他達標組合備註 (合計滿 5 星以上)</h2>
+        <div id="other-matches-list" style="color: #666; font-size: 14px;"></div>
+    </div>
+
+    <div class="card">
+        <h2>👥 參加者聯絡名冊</h2>
+        <table>
+            <thead><tr><th>暱稱</th><th>手機</th><th>職業</th><th>MBTI</th></tr></thead>
+            <tbody id="user-body"></tbody>
+        </table>
+    </div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    
     const cfg = { apiKey: "AIzaSyDv4EOEmJ8dfWgZEv5mYtaiXuzbwgjMAUA", authDomain: "jariah-match.firebaseapp.com", projectId: "jariah-match", storageBucket: "jariah-match.firebasestorage.app", messagingSenderId: "863372390147", appId: "1:863372390147:web:7541b1b478c33f3d824336" };
     const app = initializeApp(cfg); const db = getFirestore(app);
-    let ex = [];
 
-    async function load(){
-        const usnap = await getDocs(query(collection(db, "users"), orderBy("createdAt", "desc")));
-        const ub = document.getElementById('ub');
-        usnap.forEach(d => {
-            const u = d.data();
-            ex.push({ "暱稱": u.name, "電話": u.phone, "MBTI": u.mbti, "職業": u.job });
-            const p = u.photos && u.photos[0] ? `<img src="${u.photos[0]}" style="width:50px; height:50px; object-fit:cover;">` : '無';
-            ub.innerHTML += `<tr><td>${p}</td><td>${u.name}</td><td>${u.phone}</td><td>${u.mbti}</td><td>${u.job}</td></tr>`;
+    async function processMatches() {
+        const usersSnap = await getDocs(collection(db, "users"));
+        const matchesSnap = await getDocs(collection(db, "matches"));
+        
+        // 1. 整理使用者資料用於 Excel
+        let userData = [];
+        const userBody = document.getElementById('user-body');
+        usersSnap.forEach(doc => {
+            const u = doc.data();
+            userData.push({ "暱稱": u.name, "電話": u.phone, "MBTI": u.mbti, "職業": u.job });
+            userBody.innerHTML += `<tr><td><b>${u.name}</b></td><td>${u.phone}</td><td>${u.job}</td><td>${u.mbti}</td></tr>`;
+        });
+        window.allUserData = userData;
+
+        // 2. 配對邏輯：找出雙向評分並加總
+        let ratings = []; // 存儲所有的單向評分
+        matchesSnap.forEach(doc => { ratings.push(doc.data()); });
+
+        let pairScores = {}; // 存儲 A-B 組合的總分
+
+        ratings.forEach(r => {
+            // 將 A-B 和 B-A 視為同一個組合，按名字排序確保 key 一致
+            let pairKey = r.pair.sort().join(" ❤️ ");
+            if (!pairScores[pairKey]) {
+                pairScores[pairKey] = { names: r.pair, total: 0, count: 0 };
+            }
+            pairScores[pairKey].total += r.score;
+            pairScores[pairKey].count += 1; // 記錄是否為雙向(2)或單向(1)
         });
 
-        const msnap = await getDocs(collection(db, "matches"));
-        const ml = document.getElementById('ml'); ml.innerHTML = "";
-        msnap.forEach(d => {
-            const m = d.data();
-            ml.innerHTML += `<div>🔥 <b>${m.pair[0]}</b> ❤️ <b>${m.pair[1]}</b> (評分: ${m.score})</div>`;
+        // 3. 過濾並排序
+        let finalMatches = Object.values(pairScores)
+            .filter(m => m.total >= 5) // 只要合計滿 5 星
+            .sort((a, b) => b.total - a.total); // 從高分排到低分
+
+        const topDiv = document.getElementById('top-matches-list');
+        const otherDiv = document.getElementById('other-matches-list');
+        topDiv.innerHTML = "";
+        otherDiv.innerHTML = "";
+
+        if (finalMatches.length === 0) {
+            topDiv.innerHTML = "目前尚無達標組合。";
+        }
+
+        // 4. 顯示資料：最高分放在優先區，其他放備註
+        finalMatches.forEach((m, index) => {
+            const matchHtml = `
+                <div class="match-item ${m.total >= 8 ? 'top-match' : ''}">
+                    <div class="names">${m.names[0]} & ${m.names[1]}</div>
+                    <div class="score-badge">${m.total} 顆星 ${m.count === 2 ? '雙向' : '單向'}</div>
+                </div>
+            `;
+            
+            if (index < 5) { // 前 5 名最高分放在優先區
+                topDiv.innerHTML += matchHtml;
+            } else { // 其餘放備註
+                otherDiv.innerHTML += `• ${m.names[0]} & ${m.names[1]} (合計 ${m.total} 星)<br>`;
+            }
         });
+        
+        window.matchData = finalMatches.map(m => ({ "組合": `${m.names[0]} & ${m.names[1]}`, "合計星星": m.total, "評分人數": m.count }));
     }
 
     window.exportData = () => {
-        const ws = XLSX.utils.json_to_sheet(ex);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "參加者清單");
-        XLSX.writeFile(workbook, "聯誼活動名冊.xlsx");
+        // 分頁 1: 參加者清單
+        const ws1 = XLSX.utils.json_to_sheet(window.allUserData);
+        XLSX.utils.book_append_sheet(wb, ws1, "參加者清冊");
+        // 分頁 2: 配對建議
+        const ws2 = XLSX.utils.json_to_sheet(window.matchData);
+        XLSX.utils.book_append_sheet(wb, ws2, "配對建議表");
+        
+        XLSX.writeFile(wb, "聯誼活動配對成果報告.xlsx");
     };
-    load();
+
+    processMatches();
 </script>
 </body>
 </html>
