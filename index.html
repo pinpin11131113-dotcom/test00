@@ -30,9 +30,9 @@
     <h2 style="text-align:center;">活動報名</h2>
     <div class="section-title">上傳生活照 (最多三張)</div>
     <div class="photo-grid">
-        <div class="photo-box" onclick="aid=1;document.getElementById('fi').click()" id="b-1">+</div>
-        <div class="photo-box" onclick="aid=2;document.getElementById('fi').click()" id="b-2">+</div>
-        <div class="photo-box" onclick="aid=3;document.getElementById('fi').click()" id="b-3">+</div>
+        <div class="photo-box" onclick="setAid(1)" id="b-1">+</div>
+        <div class="photo-box" onclick="setAid(2)" id="b-2">+</div>
+        <div class="photo-box" onclick="setAid(3)" id="b-3">+</div>
     </div>
     <input type="file" id="fi" hidden accept="image/*" onchange="handleFile(event)">
     
@@ -70,7 +70,18 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    let aid=1, pts=["","",""], myName="", users=[], curIdx=0, myRate=0;
+    let currentAid = 1;
+    let pts = ["", "", ""];
+    let myName = "";
+    let users = [];
+    let curIdx = 0;
+    let myRate = 0;
+
+    // 點擊格子時明確設定要更新哪一個位置
+    window.setAid = (id) => {
+        currentAid = id;
+        document.getElementById('fi').click();
+    };
 
     window.handleFile = (e) => {
         const file = e.target.files[0];
@@ -85,8 +96,15 @@
                     canvas.width = w; canvas.height = h;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, w, h);
-                    pts[aid-1] = canvas.toDataURL('image/jpeg', 0.5);
-                    document.getElementById(`b-${aid}`).innerHTML = `<img src="${pts[aid-1]}">`;
+                    
+                    const compressedData = canvas.toDataURL('image/jpeg', 0.5);
+                    pts[currentAid - 1] = compressedData;
+                    
+                    // 確保更新正確的格子外觀
+                    document.getElementById(`b-${currentAid}`).innerHTML = `<img src="${compressedData}">`;
+                    
+                    // 重要：清空選取器，讓同一個格子可以重選，或是下一個格子能被觸發
+                    e.target.value = "";
                 };
                 img.src = ev.target.result;
             };
@@ -97,11 +115,11 @@
     window.saveData = async () => {
         myName = document.getElementById('nn').value;
         const phone = document.getElementById('ph').value;
-        if(!myName || !phone || !pts[0]) return alert("請填寫資料並上傳至少一張照片");
+        if(!myName || !phone || !pts[0]) return alert("請填寫資料並上傳至少第一張照片");
         try {
             await addDoc(collection(db, "users"), {
                 name: myName, phone: phone, photos: pts, mbti: document.getElementById('mb').value,
-                job: document.getElementById('jb').value, habits: Array.from(document.querySelectorAll('#ha .active')).map(t=>t.innerText),
+                job: document.getElementById('job').value, habits: Array.from(document.querySelectorAll('#ha .active')).map(t=>t.innerText),
                 createdAt: serverTimestamp()
             });
             document.getElementById('page-edit').style.display = 'none';
