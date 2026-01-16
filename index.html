@@ -9,19 +9,14 @@
         body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
         .card { background: white; border-radius: 20px; padding: 25px; width: 100%; max-width: 450px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
         .section-title { font-size: 14px; font-weight: bold; color: var(--main-p); margin: 20px 0 10px; border-left: 5px solid var(--main-p); padding-left: 10px; }
-        
-        /* 三張照片格子樣式 */
         .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
         .photo-box { aspect-ratio: 1/1; background: #f8f9fa; border-radius: 12px; display: flex; justify-content: center; align-items: center; border: 2px dashed #ddd; cursor: pointer; overflow: hidden; font-size: 24px; color: #ccc; }
         .photo-box img { width: 100%; height: 100%; object-fit: cover; }
-
         input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; }
         .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
         .tag-btn { background: #eee; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; }
         .tag-btn.active { background: var(--main-p); color: white; }
         .btn-p { background: var(--main-p); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; }
-
-        /* 探索頁面樣式 */
         .stars { display: flex; justify-content: center; gap: 12px; font-size: 35px; margin: 20px 0; }
         .star { color: #ddd; cursor: pointer; }
         .star.active { color: #ffa502; }
@@ -33,7 +28,6 @@
 
 <div class="card" id="page-edit">
     <h2 style="text-align:center;">活動報名</h2>
-    
     <div class="section-title">生活照 (請依序點擊上傳三張)</div>
     <div class="photo-grid">
         <div class="photo-box" onclick="setPos(1)" id="b-1">+</div>
@@ -44,10 +38,8 @@
     
     <div class="section-title">個人資料</div>
     <input type="text" id="nn" placeholder="暱稱 (如：肉桂)">
-    <input type="tel" id="ph" placeholder="手機號碼 (僅供主辦方聯繫)">
-    <select id="mb">
-        <option>INTP</option><option>ENFP</option><option>INTJ</option><option>INFJ</option><option>ENTP</option>
-    </select>
+    <input type="tel" id="ph" placeholder="手機號碼">
+    <select id="mb"><option>INTP</option><option>ENFP</option><option>INTJ</option><option>INFJ</option><option>ENTP</option></select>
     <input type="text" id="jb" placeholder="目前職業">
 
     <div class="section-title">生活習慣</div>
@@ -74,72 +66,64 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // Firebase 配置
-    const cfg = { 
-        apiKey: "AIzaSyDv4EOEmJ8dfWgZEv5mYtaiXuzbwgjMAUA",
-        authDomain: "jariah-match.firebaseapp.com",
-        projectId: "jariah-match",
-        storageBucket: "jariah-match.firebasestorage.app",
-        messagingSenderId: "863372390147",
-        appId: "1:863372390147:web:7541b1b478c33f3d824336"
-    };
-    const app = initializeApp(cfg);
-    const db = getFirestore(app);
+    const cfg = { apiKey: "AIzaSyDv4EOEmJ8dfWgZEv5mYtaiXuzbwgjMAUA", authDomain: "jariah-match.firebaseapp.com", projectId: "jariah-match", storageBucket: "jariah-match.firebasestorage.app", messagingSenderId: "863372390147", appId: "1:863372390147:web:7541b1b478c33f3d824336" };
+    const app = initializeApp(cfg); const db = getFirestore(app);
 
     let curId = 1, pts = ["", "", ""], myName = "", users = [], curIdx = 0, myRate = 0;
 
-    // 定位當前點擊的格子
-    window.setPos = (id) => {
-        curId = id;
-        document.getElementById('fi').click();
+    window.setPos = (id) => { curId = id; document.getElementById('fi').click(); };
+
+    window.handleFile = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width, h = img.height, max = 400; // 壓縮解析度至 400px
+                    if (w > h) { if (w > max) { h *= max / w; w = max; } } else { if (h > max) { w *= max / h; h = max; } }
+                    canvas.width = w; canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h); // 修正變數名稱
+                    const b64 = canvas.toDataURL('image/jpeg', 0.3); // 壓縮品質 0.3
+                    pts[curId - 1] = b64; // 修正變數名稱
+                    document.getElementById(`b-${curId}`).innerHTML = `<img src="${b64}">`;
+                    e.target.value = ""; 
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
-    // 照片強力壓縮邏輯
-// ... (Firebase 初始化保持不變) ...
-
-window.handleFile = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                // 將最大寬度降至 400px，確保 3 張圖加起來不超過 1MB
-                let w = img.width, h = img.height, max = 400; 
-                if (w > h) { if (w > max) { h *= max / w; w = max; } }
-                else { if (h > max) { w *= max / h; h = max; } }
-                canvas.width = w; canvas.height = h;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                // 壓縮品質降至 0.3 (強力壓縮)
-                const b64 = canvas.toDataURL('image/jpeg', 0.3); 
-                pts[currentAid - 1] = b64;
-                document.getElementById(`b-${currentAid}`).innerHTML = `<img src="${b64}">`;
-                e.target.value = ""; 
-            };
-            img.src = ev.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-};
-
-window.saveData = async () => {
-    // ... (檢查必填欄位邏輯) ...
-    try {
-        await addDoc(collection(db, "users"), { /* 儲存內容 */ });
-        alert("🎉 報名成功！");
-        location.reload(); 
-    } catch(e) {
-        // --- 顯示真正的錯誤代碼 ---
-        let msg = "系統忙碌中";
-        if (e.code === 'permission-denied') msg = "【權限不足】規則發布可能尚未生效，請等 30 秒後重試。";
-        else if (e.message.includes('exceeds')) msg = "【照片還是太大】即便壓縮後仍超過 1MB，請換一張截圖測試。";
+    window.saveData = async () => {
+        myName = document.getElementById('nn').value;
+        const phone = document.getElementById('ph').value;
+        if(!myName || !phone || !pts[0]) return alert("請填完暱稱、電話並至少傳第一張照片");
         
-        alert("❌ 失敗原因：" + msg + "\n\n詳細代碼：" + e.message);
-        console.error(e);
-    }
-};
+        try {
+            // 完整儲存邏輯
+            await addDoc(collection(db, "users"), {
+                name: myName, phone: phone, photos: pts,
+                mbti: document.getElementById('mb').value,
+                job: document.getElementById('jb').value,
+                habits: Array.from(document.querySelectorAll('#ha .active')).map(t=>t.innerText),
+                createdAt: serverTimestamp()
+            });
+            alert("🎉 報名成功！");
+            document.getElementById('page-edit').style.display = 'none';
+            document.getElementById('page-discovery').style.display = 'block';
+            fetchUsers();
+        } catch(e) {
+            let errorMsg = "系統忙碌中";
+            if (e.code === 'permission-denied') errorMsg = "【權限不足】請檢查 Firebase 規則是否已設為 true。";
+            else if (e.message.includes('exceeds')) errorMsg = "【照片太大了】即便壓縮後仍超過 1MB 限制。";
+            alert("❌ 失敗原因：" + errorMsg + "\n詳細代碼：" + e.message); //
+            console.error(e);
+        }
+    };
+
     async function fetchUsers() {
         const snap = await getDocs(collection(db, "users"));
         users = [];
