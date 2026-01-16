@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Jariah 聯誼活動 - 管理者後台</title>
+    <style>
+        body { font-family: sans-serif; padding: 30px; background: #f4f7f6; }
+        h1 { color: #764ba2; border-bottom: 2px solid #764ba2; padding-bottom: 10px; }
+        .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #764ba2; color: white; }
+        .match-card { background: #e3fcef; border-left: 5px solid #00b894; padding: 10px; margin-bottom: 10px; }
+        .btn-refresh { background: #764ba2; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <h1>Jariah 活動管理者後台</h1>
+    <button class="btn-refresh" onclick="location.reload()">重新整理最新名單</button>
+
+    <div class="dashboard-grid">
+        <div>
+            <h2>🌙 參加者聯絡名冊 (總計: <span id="user-count">0</span> 人)</h2>
+            <table id="user-table">
+                <thead>
+                    <tr>
+                        <th>暱稱</th>
+                        <th>聯絡電話</th>
+                        <th>MBTI</th>
+                        <th>職業</th>
+                        <th>報名時間</th>
+                    </tr>
+                </thead>
+                <tbody id="user-body"></tbody>
+            </table>
+        </div>
+
+        <div>
+            <h2>🎉 配對成功紀錄 (活動當天安排同桌)</h2>
+            <div id="match-list">正在讀取配對紀錄...</div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // 這裡的金鑰要跟 index.html 的完全一樣
+    const firebaseConfig = {
+      apiKey: "AIzaSyDv4EOEmJ8dfWgZEv5mYtaiXuzbwgjMAUA",
+      authDomain: "jariah-match.firebaseapp.com",
+      projectId: "jariah-match",
+      storageBucket: "jariah-match.firebasestorage.app",
+      messagingSenderId: "863372390147",
+      appId: "1:863372390147:web:7541b1b478c33f3d824336",
+      measurementId: "G-GDNBERRJJ1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadAdminData() {
+        // 1. 抓取所有使用者
+        const userSnap = await getDocs(query(collection(db, "users"), orderBy("createdAt", "desc")));
+        const userBody = document.getElementById('user-body');
+        document.getElementById('user-count').innerText = userSnap.size;
+        
+        userBody.innerHTML = "";
+        userSnap.forEach(doc => {
+            const u = doc.data();
+            const date = u.createdAt ? u.createdAt.toDate().toLocaleString() : 'N/A';
+            userBody.innerHTML += `
+                <tr>
+                    <td><b>${u.name}</b></td>
+                    <td style="color: #d63031; font-weight: bold;">${u.phone || '未填寫'}</td>
+                    <td>${u.mbti}</td>
+                    <td>${u.job}</td>
+                    <td style="font-size: 12px; color: #888;">${date}</td>
+                </tr>
+            `;
+        });
+
+        // 2. 抓取所有配對紀錄
+        const matchSnap = await getDocs(query(collection(db, "matches"), orderBy("matchDate", "desc")));
+        const matchList = document.getElementById('match-list');
+        matchList.innerHTML = "";
+
+        if (matchSnap.empty) {
+            matchList.innerHTML = "目前尚無人配對成功。";
+        } else {
+            matchSnap.forEach(doc => {
+                const m = doc.data();
+                matchList.innerHTML += `
+                    <div class="match-card">
+                        🔥 <b>${m.pair[0]}</b> 與 <b>${m.pair[1]}</b> 配對成功！ (總分: ${m.totalScore} 顆星)
+                    </div>
+                `;
+            });
+        }
+    }
+
+    loadAdminData();
+</script>
+</body>
+</html>
