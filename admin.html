@@ -2,61 +2,104 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>Jariah 管理後台 - 照片預覽版</title>
+    <title>Jariah 活動管理後台 - 全能分析版</title>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f8f9fa; }
-        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
-        th { background: #764ba2; color: white; }
-        .img-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; margin-right: 5px; border: 1px solid #ddd; }
-        .match-box { background: #fff5f6; border-left: 5px solid #ff4757; padding: 15px; margin-bottom: 10px; font-weight: bold; }
+        body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
+        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        h2 { color: #764ba2; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+        /* 強化後的配對項目樣式 */
+        .match-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; border-radius: 12px; margin-bottom: 12px; background: white; border: 1px solid #eee; }
+        .mutual { border-left: 8px solid #27ae60; background: #f1fcf5; } /* 雙向綠色 */
+        .single { border-left: 8px solid #ffa502; background: #fffaf0; } /* 單向黃色 */
+        
+        .pair-photos { display: flex; gap: 5px; align-items: center; }
+        .avatar { width: 50px; height: 50px; object-ratio: 1/1; border-radius: 50%; border: 2px solid white; object-fit: cover; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .names { font-size: 16px; font-weight: bold; margin-left: 10px; }
+        .score-box { text-align: right; }
+        .score-num { font-size: 20px; font-weight: bold; color: #ff4757; }
+        .status-tag { font-size: 11px; padding: 3px 8px; border-radius: 10px; color: white; margin-top: 5px; display: inline-block; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+        th, td { padding: 12px; border: 1px solid #eee; text-align: left; }
     </style>
 </head>
 <body>
-    <h1>Jariah 活動管理後台</h1>
-    <button onclick="exportToExcel()" style="background:#27ae60; color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">📊 匯出 Excel 名單</button>
+    <h1>Jariah 精準活動監控</h1>
+    <button onclick="exportData()" style="background:#27ae60; color:white; padding:12px 25px; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">📊 匯出完整 Excel 名單與配對表</button>
 
     <div class="card">
-        <h2>🔥 最佳配對組合 (合計分數最高優先)</h2>
-        <div id="match-list">計算中...</div>
+        <h2>🔥 達標組合清單 (合計滿 5 星)</h2>
+        <div id="full-match-list">正在讀取最新數據...</div>
     </div>
 
     <div class="card">
-        <h2>👥 參加者名冊 (含照片預覽)</h2>
+        <h2>👥 報名者聯絡清冊</h2>
         <table>
-            <thead><tr><th>照片</th><th>暱稱</th><th>手機</th><th>職業</th></tr></thead>
+            <thead><tr><th>照片</th><th>暱稱</th><th>電話</th><th>職業</th></tr></thead>
             <tbody id="user-body"></tbody>
         </table>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    
     const cfg = { apiKey: "AIzaSyDv4EOEmJ8dfWgZEv5mYtaiXuzbwgjMAUA", authDomain: "jariah-match.firebaseapp.com", projectId: "jariah-match", storageBucket: "jariah-match.firebasestorage.app", messagingSenderId: "863372390147", appId: "1:863372390147:web:7541b1b478c33f3d824336" };
     const app = initializeApp(cfg); const db = getFirestore(app);
-    let excelData = [];
 
-    async function load(){
-        // 1. 載入參加者照片與資料
-        const usnap = await getDocs(query(collection(db, "users"), orderBy("createdAt", "desc")));
+    async function load() {
+        const uSnap = await getDocs(collection(db, "users"));
+        const mSnap = await getDocs(collection(db, "matches"));
+        
+        let users = {};
         const ub = document.getElementById('user-body');
-        usnap.forEach(d => {
+        uSnap.forEach(d => {
             const u = d.data();
-            excelData.push({ "暱稱": u.name, "電話": u.phone, "MBTI": u.mbti, "職業": u.job });
-            // 處理三張照片的顯示
-            const p = u.photos.filter(x=>x).map(x=>`<img src="${x}" class="img-thumb">`).join('');
+            users[u.name] = u; // 建立索引方便抓照片
+            const p = u.photos && u.photos[0] ? `<img src="${u.photos[0]}" style="width:50px; height:50px; object-fit:cover;">` : '👤';
             ub.innerHTML += `<tr><td>${p}</td><td><b>${u.name}</b></td><td>${u.phone}</td><td>${u.job}</td></tr>`;
         });
 
-        // 2. 配對邏輯 (與前版相同) ...
+        let pairScores = {};
+        mSnap.forEach(doc => {
+            const r = doc.data();
+            let key = r.pair.sort().join("-");
+            if (!pairScores[key]) pairScores[key] = { names: r.pair, total: 0, count: 0 };
+            pairScores[key].total += r.score;
+            pairScores[key].count += 1;
+        });
+
+        // 排序：雙向(count=2)優先，分數高優先
+        let final = Object.values(pairScores)
+            .filter(m => m.total >= 5)
+            .sort((a, b) => (b.count * 100 + b.total) - (a.count * 100 + a.total));
+
+        const ml = document.getElementById('full-match-list');
+        ml.innerHTML = "";
+        final.forEach(m => {
+            const p1 = users[m.names[0]]?.photos?.[0] || '';
+            const p2 = users[m.names[1]]?.photos?.[0] || '';
+            const statusClass = m.count === 2 ? 'mutual' : 'single';
+            const statusText = m.count === 2 ? '雙向互相心動' : '單向心動';
+            const tagColor = m.count === 2 ? '#27ae60' : '#ffa502';
+
+            ml.innerHTML += `
+                <div class="match-item ${statusClass}">
+                    <div class="pair-photos">
+                        <img src="${p1}" class="avatar"><img src="${p2}" class="avatar">
+                        <div class="names">${m.names[0]} & ${m.names[1]}</div>
+                    </div>
+                    <div class="score-box">
+                        <div class="score-num">${m.total} ★</div>
+                        <div class="status-tag" style="background:${tagColor}">${statusText}</div>
+                    </div>
+                </div>
+            `;
+        });
+        window.allEx = final.map(m => ({ "組合": `${m.names[0]} & ${m.names[1]}`, "合計星星": m.total, "狀態": m.count === 2 ? '雙向' : '單向' }));
     }
-    window.exportToExcel = () => {
-        const ws = XLSX.utils.json_to_sheet(excelData);
-        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "名單");
-        XLSX.writeFile(wb, "活動名冊.xlsx");
-    };
     load();
 </script>
 </body>
