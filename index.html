@@ -3,237 +3,307 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jariah 聯誼配對系統</title>
+    <title>月下老人 - 聯誼配對系統</title>
     <style>
-        /* --- 1. 整體頁面設定 (包含新的背景色) --- */
+        /* --- 1. 視覺設計：橘黃色背景與字體 --- */
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            /* 這裡設定你想要的橘黃色背景 */
-            background-color: #FFECB3; 
-            /* 如果喜歡漸層，可以把上面那行註解掉，換成下面這行試試看 */
-            /* background: linear-gradient(135deg, #FFD194, #D1913C); */
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background-color: #FFB74D; /* 溫暖橘黃色 */
             margin: 0;
-            padding: 20px;
-            color: #333;
+            padding: 10px;
+            color: #4E342E;
         }
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #fff; /* 內容區塊維持白色，比較好閱讀 */
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 10px auto;
+            background-color: #FFF9F0;
+            padding: 25px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-        h1, h2, h3 { color: #444; text-align: center; }
-        .section {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
-        }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        h1 { color: #E64A19; text-align: center; font-size: 32px; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #8D6E63; margin-bottom: 25px; font-size: 14px; }
+        
+        h2 { border-left: 5px solid #E64A19; padding-left: 10px; color: #5D4037; font-size: 20px; margin-top: 30px; }
+        h3 { font-size: 16px; margin-top: 25px; color: #D84315; border-bottom: 1px solid #FFCC80; padding-bottom: 5px; }
+
+        .section { margin-bottom: 35px; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 15px; }
+
         input[type="text"], input[type="number"], select, textarea {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
+            border: 1.5px solid #FFCC80;
+            border-radius: 12px;
             font-size: 16px;
+            background-color: white;
+            box-sizing: border-box;
         }
-        button {
-            width: 100%;
-            padding: 15px;
-            background-color: #FF6B6B; /* 按鈕用比較跳的顏色 */
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover { background-color: #FF4757; }
+        textarea { resize: vertical; min-height: 100px; }
 
-        /* --- 2. 標籤按鈕的特別設計 (CSS) --- */
-        /* 標籤容器，讓按鈕排整齊 */
+        /* MBTI 測試連結按鈕 */
+        .btn-test {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 8px 16px;
+            background-color: #FB8C00;
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* --- 2. 標籤化按鈕設計 (Chips) --- */
         .tag-container {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin-top: 10px;
-            margin-bottom: 20px;
+            margin-top: 12px;
         }
-        /* 隱藏原本醜醜的勾選框 */
         .tag-checkbox { display: none; }
-        
-        /* 標籤按鈕的長相 (未點擊) */
         .tag-label {
             display: inline-block;
             padding: 8px 16px;
-            border: 1px solid #E0E0E0;
+            border: 1.5px solid #FFCC80;
             border-radius: 25px;
-            background-color: #F8F9FA;
-            color: #555;
+            background-color: #FFF;
+            color: #5D4037;
             cursor: pointer;
             font-size: 14px;
             transition: all 0.2s ease;
-            user-select: none;
         }
-        /* 標籤按鈕被點擊後的長相 (變成粉紅色) */
         .tag-checkbox:checked + .tag-label {
-            background-color: #FFB6C1;
+            background-color: #FF8A80;
             color: white;
-            border-color: #FFB6C1;
-            box-shadow: 0 2px 4px rgba(255, 182, 193, 0.4);
-            transform: translateY(-2px);
+            border-color: #FF8A80;
+            box-shadow: 0 3px 8px rgba(255, 138, 128, 0.4);
         }
-        /* 當選滿 3 個後，其他標籤變淡且不能點擊 */
         .tag-checkbox:disabled + .tag-label {
-            opacity: 0.4;
+            opacity: 0.3;
             cursor: not-allowed;
-            background-color: #EEE;
-            transform: none;
+            background-color: #F5F5F5;
         }
+
+        /* 主按鈕 */
+        .btn-main {
+            width: 100%;
+            padding: 16px;
+            background-color: #E64A19;
+            color: white;
+            border: none;
+            border-radius: 35px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(230, 74, 25, 0.3);
+            margin-top: 20px;
+        }
+        .btn-main:hover { background-color: #BF360C; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Jariah 聯誼配對系統</h1>
+    <h1>月下老人</h1>
+    <div class="subtitle">遇見妳的命中注定</div>
 
-    <div class="section" id="profile-section">
-        <h2>建立個人檔案</h2>
-
-        <div class="input-group">
-            <label>生活照 (最多三張)</label>
-            <input type="file" accept="image/*">
-            <input type="file" accept="image/*" style="margin-top: 10px;">
-            <input type="file" accept="image/*" style="margin-top: 10px;">
-            <p style="font-size: 12px; color: gray;">💡 展現最真實的妳，讓命中注定的對象能一眼認出妳喔。</p>
-        </div>
-
+    <div id="setup-page">
         <div class="section">
-            <h3>基本資料</h3>
+            <h2>建立個人檔案</h2>
+            
+            <div class="input-group">
+                <label>生活照 (最多三張)</label>
+                <input type="file" multiple accept="image/*">
+            </div>
+
+            <div class="input-group">
+                <label>妳的名字 / 暱稱</label>
+                <input type="text" id="userName" placeholder="大家該怎麼稱呼妳呢？">
+            </div>
+
+            <div class="input-group">
+                <label>性取向</label>
+                <select id="sexualOrientation">
+                    <option value="" disabled selected>請選擇</option>
+                    <option value="lesbian">女同志</option>
+                    <option value="bisexual">雙性戀</option>
+                    <option value="pansexual">泛性戀</option>
+                    <option value="queer">酷兒</option>
+                    <option value="nolabel">No Label</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>自我認同</label>
+                <select id="identity">
+                    <option value="" disabled selected>請選擇</option>
+                    <option value="lesbian_id">Lesbian</option>
+                    <option value="genderqueer">性別酷兒</option>
+                    <option value="nolabel_id">No Label / 不想標籤</option>
+                    <option value="other">其他</option>
+                </select>
+            </div>
+
             <div class="input-group">
                 <label>身高 (cm)</label>
-                <input type="number" id="userHeight" min="100" max="220" placeholder="請輸入 100-220 之間的數字">
+                <input type="number" id="heightInput" min="100" max="220" placeholder="範圍：100 - 220">
             </div>
-        
+
+            <div class="input-group">
+                <label>星座</label>
+                <select id="horoscopeSelect">
+                    <option value="" disabled selected>請選擇妳的星座</option>
+                    <option value="Aries">牡羊座</option><option value="Taurus">金牛座</option>
+                    <option value="Gemini">雙子座</option><option value="Cancer">巨蟹座</option>
+                    <option value="Leo">獅子座</option><option value="Virgo">處女座</option>
+                    <option value="Libra">天秤座</option><option value="Scorpio">天蠍座</option>
+                    <option value="Sagittarius">射手座</option><option value="Capricorn">摩羯座</option>
+                    <option value="Aquarius">水瓶座</option><option value="Pisces">雙魚座</option>
+                </select>
+            </div>
+
             <div class="input-group">
                 <label>MBTI 人格類型</label>
-                <select id="userMBTI">
-                    <option value="unknown" selected>我不知道 / 還沒測過</option>
+                <a href="https://www.16personalities.com/tw/%E4%BA%BA%E6%A0%BC%E6%B8%AC%E8%A9%A6" target="_blank" class="btn-test">還沒測過？點我測量 MBTI</a>
+                <select id="mbtiSelect" style="margin-top: 12px;">
+                    <option value="unknown">我不知道 / 還沒測過</option>
                     <optgroup label="分析家 (NT)">
-                        <option value="INTJ">INTJ (建築師)</option>
-                        <option value="INTP">INTP (邏輯學家)</option>
-                        <option value="ENTJ">ENTJ (指揮官)</option>
-                        <option value="ENTP">ENTP (辯論家)</option>
+                        <option value="INTJ">INTJ (建築師)</option><option value="INTP">INTP (邏輯學家)</option>
+                        <option value="ENTJ">ENTJ (指揮官)</option><option value="ENTP">ENTP (辯論家)</option>
                     </optgroup>
                     <optgroup label="外交官 (NF)">
-                        <option value="INFJ">INFJ (提倡者)</option>
-                        <option value="INFP">INFP (調解者)</option>
-                        <option value="ENFJ">ENFJ (主人公)</option>
-                        <option value="ENFP">ENFP (競選者)</option>
+                        <option value="INFJ">INFJ (提倡者)</option><option value="INFP">INFP (調解者)</option>
+                        <option value="ENFJ">ENFJ (主人公)</option><option value="ENFP">ENFP (競選者)</option>
                     </optgroup>
                     <optgroup label="守護者 (SJ)">
-                        <option value="ISTJ">ISTJ (物流師)</option>
-                        <option value="ISFJ">ISFJ (守衛者)</option>
-                        <option value="ESTJ">ESTJ (總管)</option>
-                        <option value="ESFJ">ESFJ (執政官)</option>
+                        <option value="ISTJ">ISTJ (物流師)</option><option value="ISFJ">ISFJ (守衛者)</option>
+                        <option value="ESTJ">ESTJ (總管)</option><option value="ESFJ">ESFJ (執政官)</option>
                     </optgroup>
                     <optgroup label="探險家 (SP)">
-                        <option value="ISTP">ISTP (鑒賞家)</option>
-                        <option value="ISFP">ISFP (探險家)</option>
-                        <option value="ESTP">ESTP (企業家)</option>
-                        <option value="ESFP">ESFP (表演者)</option>
+                        <option value="ISTP">ISTP (鑒賞家)</option><option value="ISFP">ISFP (探險家)</option>
+                        <option value="ESTP">ESTP (企業家)</option><option value="ESFP">ESFP (表演者)</option>
                     </optgroup>
                 </select>
+            </div>
+
+            <div class="input-group">
+                <label>自我介紹</label>
+                <textarea id="userBio" placeholder="寫下妳的故事、興趣，或是對另一半的期待..."></textarea>
             </div>
         </div>
 
         <div class="section">
             <h3>社交與互動風格 (最多選 3 項)</h3>
-            <div class="tag-container" id="social-group">
-                <input type="checkbox" id="s1" class="tag-checkbox social-limit"><label for="s1" class="tag-label">熱情主動</label>
-                <input type="checkbox" id="s2" class="tag-checkbox social-limit"><label for="s2" class="tag-label">慢熱內斂</label>
-                <input type="checkbox" id="s3" class="tag-checkbox social-limit"><label for="s3" class="tag-label">幽默風趣</label>
-                <input type="checkbox" id="s4" class="tag-checkbox social-limit"><label for="s4" class="tag-label">傾聽者</label>
-                <input type="checkbox" id="s5" class="tag-checkbox social-limit"><label for="s5" class="tag-label">直言不諱</label>
-                <input type="checkbox" id="s6" class="tag-checkbox social-limit"><label for="s6" class="tag-label">溫柔體貼</label>
-                <input type="checkbox" id="s7" class="tag-checkbox social-limit"><label for="s7" class="tag-label">獨立自主</label>
-                <input type="checkbox" id="s8" class="tag-checkbox social-limit"><label for="s8" class="tag-label">喜歡深度對話</label>
-                <input type="checkbox" id="s9" class="tag-checkbox social-limit"><label for="s9" class="tag-label">合群隨和</label>
-                <input type="checkbox" id="s10" class="tag-checkbox social-limit"><label for="s10" class="tag-label">充滿好奇心</label>
-                <input type="checkbox" id="s11" class="tag-checkbox social-limit"><label for="s11" class="tag-label">觀察敏銳</label>
-                <input type="checkbox" id="s12" class="tag-checkbox social-limit"><label for="s12" class="tag-label">給予對方空間</label>
-                <input type="checkbox" id="s13" class="tag-checkbox social-limit"><label for="s13" class="tag-label">很有主見</label>
-                <input type="checkbox" id="s14" class="tag-checkbox social-limit"><label for="s14" class="tag-label">不拘小節</label>
-                <input type="checkbox" id="s15" class="tag-checkbox social-limit"><label for="s15" class="tag-label">慢條斯理</label>
+            <div class="tag-container">
+                <input type="checkbox" id="s1" class="tag-checkbox social-cb"><label for="s1" class="tag-label">熱情主動</label>
+                <input type="checkbox" id="s2" class="tag-checkbox social-cb"><label for="s2" class="tag-label">慢熱內斂</label>
+                <input type="checkbox" id="s3" class="tag-checkbox social-cb"><label for="s3" class="tag-label">幽默風趣</label>
+                <input type="checkbox" id="s4" class="tag-checkbox social-cb"><label for="s4" class="tag-label">優質傾聽</label>
+                <input type="checkbox" id="s5" class="tag-checkbox social-cb"><label for="s5" class="tag-label">直言不諱</label>
+                <input type="checkbox" id="s6" class="tag-checkbox social-cb"><label for="s6" class="tag-label">溫柔體貼</label>
+                <input type="checkbox" id="s7" class="tag-checkbox social-cb"><label for="s7" class="tag-label">獨立自主</label>
+                <input type="checkbox" id="s8" class="tag-checkbox social-cb"><label for="s8" class="tag-label">深度對話</label>
+                <input type="checkbox" id="s9" class="tag-checkbox social-cb"><label for="s9" class="tag-label">合群隨和</label>
+                <input type="checkbox" id="s10" class="tag-checkbox social-cb"><label for="s10" class="tag-label">充滿好奇</label>
+                <input type="checkbox" id="s11" class="tag-checkbox social-cb"><label for="s11" class="tag-label">觀察敏銳</label>
+                <input type="checkbox" id="s12" class="tag-checkbox social-cb"><label for="s12" class="tag-label">給予空間</label>
+                <input type="checkbox" id="s13" class="tag-checkbox social-cb"><label for="s13" class="tag-label">有主見</label>
+                <input type="checkbox" id="s14" class="tag-checkbox social-cb"><label for="s14" class="tag-label">不拘小節</label>
+                <input type="checkbox" id="s15" class="tag-checkbox social-cb"><label for="s15" class="tag-label">優雅得體</label>
             </div>
         </div>
 
         <div class="section">
-            <h3>情緒與感受方式 (15項)</h3>
-            <p>(此處未來可套用相同標籤設計)</p>
-        </div>
-        <div class="section">
-            <h3>生活態度與價值觀 (15項)</h3>
-            <p>(此處未來可套用相同標籤設計)</p>
-        </div>
-
-        <button onclick="enterVenue()">進入會場</button>
-    </div>
-
-    <div id="matching-section" style="display: none;">
-        <h2>探索對象</h2>
-        <div style="text-align: center; padding: 50px;">
-            <p>這裡未來會顯示配對卡片...</p>
-            <div class="rating-stars" style="font-size: 30px; color: gold; cursor: pointer;">
-                ★★★★★
+            <h3>情緒與感受方式 (最多選 3 項)</h3>
+            <div class="tag-container">
+                <input type="checkbox" id="e1" class="tag-checkbox emotion-cb"><label for="e1" class="tag-label">感性細膩</label>
+                <input type="checkbox" id="e2" class="tag-checkbox emotion-cb"><label for="e2" class="tag-label">冷靜理智</label>
+                <input type="checkbox" id="e3" class="tag-checkbox emotion-cb"><label for="e3" class="tag-label">情緒穩定</label>
+                <input type="checkbox" id="e4" class="tag-checkbox emotion-cb"><label for="e4" class="tag-label">同理心強</label>
+                <input type="checkbox" id="e5" class="tag-checkbox emotion-cb"><label for="e5" class="tag-label">直覺敏銳</label>
+                <input type="checkbox" id="e6" class="tag-checkbox emotion-cb"><label for="e6" class="tag-label">樂觀積極</label>
+                <input type="checkbox" id="e7" class="tag-checkbox emotion-cb"><label for="e7" class="tag-label">內斂平靜</label>
+                <input type="checkbox" id="e8" class="tag-checkbox emotion-cb"><label for="e8" class="tag-label">情感充沛</label>
+                <input type="checkbox" id="e9" class="tag-checkbox emotion-cb"><label for="e9" class="tag-label">隨遇而安</label>
+                <input type="checkbox" id="e10" class="tag-checkbox emotion-cb"><label for="e10" class="tag-label">謹慎防備</label>
+                <input type="checkbox" id="e11" class="tag-checkbox emotion-cb"><label for="e11" class="tag-label">渴望共鳴</label>
+                <input type="checkbox" id="e12" class="tag-checkbox emotion-cb"><label for="e12" class="tag-label">自我覺察</label>
+                <input type="checkbox" id="e13" class="tag-checkbox emotion-cb"><label for="e13" class="tag-label">坦率大方</label>
+                <input type="checkbox" id="e14" class="tag-checkbox emotion-cb"><label for="e14" class="tag-label">安穩踏實</label>
+                <input type="checkbox" id="e15" class="tag-checkbox emotion-cb"><label for="e15" class="tag-label">追求成長</label>
             </div>
         </div>
-        <button onclick="showProfile()">修改報名資料</button>
+
+        <div class="section">
+            <h3>生活態度與價值觀 (最多選 3 項)</h3>
+            <div class="tag-container">
+                <input type="checkbox" id="v1" class="tag-checkbox value-cb"><label for="v1" class="tag-label">事業優先</label>
+                <input type="checkbox" id="v2" class="tag-checkbox value-cb"><label for="v2" class="tag-label">重視家庭</label>
+                <input type="checkbox" id="v3" class="tag-checkbox value-cb"><label for="v3" class="tag-label">戶外冒險</label>
+                <input type="checkbox" id="v4" class="tag-checkbox value-cb"><label for="v4" class="tag-label">宅在家中</label>
+                <input type="checkbox" id="v5" class="tag-checkbox value-cb"><label for="v5" class="tag-label">極簡主義</label>
+                <input type="checkbox" id="v6" class="tag-checkbox value-cb"><label for="v6" class="tag-label">享樂生活</label>
+                <input type="checkbox" id="v7" class="tag-checkbox value-cb"><label for="v7" class="tag-label">藝術品味</label>
+                <input type="checkbox" id="v8" class="tag-checkbox value-cb"><label for="v8" class="tag-label">性別平權</label>
+                <input type="checkbox" id="v9" class="tag-checkbox value-cb"><label for="v9" class="tag-label">穩定安逸</label>
+                <input type="checkbox" id="v10" class="tag-checkbox value-cb"><label for="v10" class="tag-label">活在當下</label>
+                <input type="checkbox" id="v11" class="tag-checkbox value-cb"><label for="v11" class="tag-label">財務自由</label>
+                <input type="checkbox" id="v12" class="tag-checkbox value-cb"><label for="v12" class="tag-label">愛護動物</label>
+                <input type="checkbox" id="v13" class="tag-checkbox value-cb"><label for="v13" class="tag-label">儀式感</label>
+                <input type="checkbox" id="v14" class="tag-checkbox value-cb"><label for="v14" class="tag-label">自由不羈</label>
+                <input type="checkbox" id="v15" class="tag-checkbox value-cb"><label for="v15" class="tag-label">健康養生</label>
+            </div>
+        </div>
+
+        <button class="btn-main" onclick="goToVenue()">進入會場，尋找緣分</button>
     </div>
 
+    <div id="venue-page" style="display: none;">
+        <h2>配對會場</h2>
+        <p style="text-align: center;">正在為您比對互給星星的對象...</p>
+        <div style="background: #FFF; padding: 20px; border-radius: 15px; margin-top: 20px; text-align: center;">
+            <p>🌟 這裡將顯示與妳「雙向奔赴」的人</p>
+        </div>
+        <button class="btn-main" onclick="goToSetup()" style="background-color: #8D6E63;">回個人檔案修改</button>
+    </div>
 </div>
 
 <script>
-    // 簡單的頁面切換功能
-    function enterVenue() {
-        document.getElementById('profile-section').style.display = 'none';
-        document.getElementById('matching-section').style.display = 'block';
-        window.scrollTo(0, 0);
-    }
-    function showProfile() {
-        document.getElementById('matching-section').style.display = 'none';
-        document.getElementById('profile-section').style.display = 'block';
-        window.scrollTo(0, 0);
-    }
-
-    // --- 核心功能：限制多選標籤的數量 ---
-    // 這是一個通用的監控工具
-    function setupLimit(selector, maxCount) {
-        const checkboxes = document.querySelectorAll(selector);
+    // 限制每組 3 個
+    function setupLimit(className, max) {
+        const checkboxes = document.querySelectorAll('.' + className);
         checkboxes.forEach(cb => {
             cb.addEventListener('change', () => {
-                const checkedCount = document.querySelectorAll(selector + ':checked').length;
-                if (checkedCount >= maxCount) {
-                    // 選滿了，鎖住其他沒選的
-                    checkboxes.forEach(item => {
-                        if (!item.checked) item.disabled = true;
-                    });
-                } else {
-                    // 不滿，全部解鎖
-                    checkboxes.forEach(item => item.disabled = false);
-                }
+                const checked = document.querySelectorAll('.' + className + ':checked');
+                checkboxes.forEach(item => {
+                    if (!item.checked) item.disabled = (checked.length >= max);
+                });
             });
         });
     }
+    setupLimit('social-cb', 3);
+    setupLimit('emotion-cb', 3);
+    setupLimit('value-cb', 3);
 
-    // 啟動監控功能：針對「社交風格」(class 是 social-limit)，限制 3 個
-    setupLimit('.social-limit', 3);
+    function goToVenue() {
+        if (!document.getElementById('userName').value) { alert("請填寫名字"); return; }
+        const h = document.getElementById('heightInput').value;
+        if (!h || h < 100 || h > 220) { alert("請填寫身高 (100-220)"); return; }
+        if (!document.getElementById('horoscopeSelect').value) { alert("請選擇星座"); return; }
+        if (!document.getElementById('sexualOrientation').value) { alert("請選擇性取向"); return; }
+        if (!document.getElementById('identity').value) { alert("請選擇自我認同"); return; }
 
-    // 未來如果有「情緒感受」要限制，只需要加一行：
-    // setupLimit('.emotion-limit', 3);
+        document.getElementById('setup-page').style.display = 'none';
+        document.getElementById('venue-page').style.display = 'block';
+        window.scrollTo(0, 0);
+    }
+    function goToSetup() {
+        document.getElementById('venue-page').style.display = 'none';
+        document.getElementById('setup-page').style.display = 'block';
+        window.scrollTo(0, 0);
+    }
 </script>
 
 </body>
