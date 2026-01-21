@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -7,154 +8,198 @@
     <style>
         :root { --main-p: #764ba2; --bg: #f0f2f5; }
         body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
-        .card { background: white; border-radius: 20px; padding: 25px; width: 100%; max-width: 450px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        .section-title { font-size: 14px; font-weight: bold; color: var(--main-p); margin: 20px 0 10px; border-left: 5px solid var(--main-p); padding-left: 10px; }
-        .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .photo-box { aspect-ratio: 1/1; background: #f8f9fa; border-radius: 12px; display: flex; justify-content: center; align-items: center; border: 2px dashed #ddd; cursor: pointer; overflow: hidden; font-size: 24px; color: #ccc; }
-        .photo-box img { width: 100%; height: 100%; object-fit: cover; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; }
-        .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-        .tag-btn { background: #eee; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; }
+        .card { background: white; border-radius: 20px; padding: 25px; width: 100%; max-width: 480px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .section-title { font-size: 15px; font-weight: bold; color: var(--main-p); margin: 25px 0 12px; border-left: 5px solid var(--main-p); padding-left: 10px; }
+        .hint-text { font-size: 12px; color: #888; margin-bottom: 15px; line-height: 1.5; }
+        .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+        .tag-btn { background: #f0f0f0; padding: 6px 14px; border-radius: 20px; font-size: 11px; cursor: pointer; color: #666; transition: 0.2s; }
         .tag-btn.active { background: var(--main-p); color: white; }
+        .manual-input { width: 100%; padding: 10px; border: 1px dashed #ccc; border-radius: 10px; font-size: 12px; margin-top: 5px; box-sizing: border-box; outline: none; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 12px; margin-bottom: 12px; box-sizing: border-box; background: #fafafa; }
+        textarea { height: 100px; resize: none; }
         .btn-p { background: var(--main-p); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .stars { display: flex; justify-content: center; gap: 12px; font-size: 35px; margin: 20px 0; }
+        .match-status-bar { background: #fff5f6; border: 1px solid #ffccd5; border-radius: 15px; padding: 15px; margin-bottom: 20px; text-align: center; font-weight: bold; }
+        .img-scroll { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px; }
+        .img-scroll img { height: 180px; width: 140px; object-fit: cover; border-radius: 15px; flex-shrink: 0; }
+        .profile-display { background: #fdfdff; border: 1px solid #eef; border-radius: 15px; padding: 15px; margin-top: 15px; }
+        .stars { display: flex; justify-content: center; gap: 12px; font-size: 35px; margin: 15px 0; }
         .star { color: #ddd; cursor: pointer; }
         .star.active { color: #ffa502; }
-        .img-scroll { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 10px; }
-        .img-scroll img { height: 200px; border-radius: 15px; }
     </style>
 </head>
 <body>
 
-<div class="card" id="page-edit">
-    <h2 style="text-align:center;">活動報名</h2>
-    <div class="section-title">生活照 (請依序點擊上傳三張)</div>
-    <div class="photo-grid">
-        <div class="photo-box" onclick="setPos(1)" id="b-1">+</div>
-        <div class="photo-box" onclick="setPos(2)" id="b-2">+</div>
-        <div class="photo-box" onclick="setPos(3)" id="b-3">+</div>
+<div class="card" id="page-edit" style="display:none;">
+    <h2 style="text-align:center;">建立個人檔案</h2>
+    <div class="section-title">生活照 (最多三張)</div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 5px;">
+        <div class="photo-box" style="aspect-ratio:1/1; background:#f8f9fa; border-radius:12px; display:flex; justify-content:center; align-items:center; border:2px dashed #ddd; cursor:pointer;" onclick="setPos(1)" id="b-1">+</div>
+        <div class="photo-box" style="aspect-ratio:1/1; background:#f8f9fa; border-radius:12px; display:flex; justify-content:center; align-items:center; border:2px dashed #ddd; cursor:pointer;" onclick="setPos(2)" id="b-2">+</div>
+        <div class="photo-box" style="aspect-ratio:1/1; background:#f8f9fa; border-radius:12px; display:flex; justify-content:center; align-items:center; border:2px dashed #ddd; cursor:pointer;" onclick="setPos(3)" id="b-3">+</div>
     </div>
+    <div class="hint-text">💡 展現最真實的妳，讓命中注定的對象能一眼認出妳喔。</div>
     <input type="file" id="fi" hidden accept="image/*" onchange="handleFile(event)">
-    
-    <div class="section-title">個人資料</div>
-    <input type="text" id="nn" placeholder="暱稱 (如：肉桂)">
-    <input type="tel" id="ph" placeholder="手機號碼">
-    <select id="mb"><option>INTP</option><option>ENFP</option><option>INTJ</option><option>INFJ</option><option>ENTP</option></select>
-    <input type="text" id="jb" placeholder="目前職業">
 
-    <div class="section-title">生活習慣</div>
-    <div class="tag-group" id="ha">
-        <span class="tag-btn" onclick="this.classList.toggle('active')">不抽菸</span>
-        <span class="tag-btn" onclick="this.classList.toggle('active')">偶爾喝酒</span>
-        <span class="tag-btn" onclick="this.classList.toggle('active')">夜貓子</span>
-        <span class="tag-btn" onclick="this.classList.toggle('active')">有運動習慣</span>
+    <div class="section-title">基本資料</div>
+    <input type="text" id="nn" placeholder="暱稱">
+    <input type="tel" id="ph" placeholder="手機號碼 (僅供聯繫用)">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <input type="text" id="bd" placeholder="生日 (MM/DD)">
+        <select id="sx"><option value="">星盤/紫微</option><option>雙魚座</option><option>處女座</option><option>天蠍座</option></select>
     </div>
-    <button class="btn-p" onclick="saveData()">完成報名並開始配對</button>
+    <textarea id="bi" placeholder="個人簡介... (例如：養了一隻貓和一隻兔子的狗派)"></textarea>
+
+    <div class="section-title">社交與互動風格 (15項)</div>
+    <div class="tag-group" id="s-tags"></div>
+    <input type="text" id="s-extra" class="manual-input" placeholder="+ 手動補充您的社交風格">
+
+    <div class="section-title">情緒與感受方式 (15項)</div>
+    <div class="tag-group" id="e-tags"></div>
+    <input type="text" id="e-extra" class="manual-input" placeholder="+ 手動補充您的情緒特質">
+
+    <div class="section-title">生活態度與價值觀 (15項)</div>
+    <div class="tag-group" id="v-tags"></div>
+    <input type="text" id="v-extra" class="manual-input" placeholder="+ 手動補充您的價值觀">
+
+    <div class="section-title">感情認同</div>
+    <select id="orient"><option value="">性取向</option><option>女同志</option><option>雙性戀</option><option>泛性戀</option><option>酷兒</option><option>No Label</option></select>
+    <select id="ident"><option value="">自我認同</option><option>Lesbian</option><option>性別酷兒</option><option>No Label / 不想標籤</option><option>其他</option></select>
+    <select id="stat"><option value="">感情狀態</option><option>單身</option><option>開放式關係</option><option>曖昧中</option><option>尋找穩定關係</option></select>
+
+    <button class="btn-p" onclick="saveData()">進入會場</button>
 </div>
 
 <div class="card" id="page-discovery" style="display:none;">
-    <h2 id="target-name">探索對象</h2>
-    <div id="target-photos" class="img-scroll"></div>
-    <div id="target-info" style="font-size: 15px; line-height: 1.8; color: #444;"></div>
-    <div class="stars">
-        <span class="star" data-v="1">★</span><span class="star" data-v="2">★</span><span class="star" data-v="3">★</span><span class="star" data-v="4">★</span><span class="star" data-v="5">★</span>
+    <div class="match-status-bar" id="match-status-ui">讀取緣分中...</div>
+    <img id="old-man-img" src="staff_old_man.jpg" style="width:100%; border-radius:15px; display:none; margin-bottom:20px;">
+    
+    <div id="success-match-area" style="display:none; margin-bottom:20px;">
+        <div style="color:var(--main-p); font-size:13px; font-weight:bold; margin-bottom:10px;">🌟 互有好感的對象 (最多3位)：</div>
+        <div id="match-list"></div>
     </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h2>探索對象</h2>
+        <button onclick="location.reload()" style="font-size:11px; padding:5px; background:#eee; border:none; border-radius:5px;">更新名單</button>
+    </div>
+    
+    <div id="target-photos" class="img-scroll"></div>
+    <div class="profile-display">
+        <div id="target-name" style="font-size:22px; font-weight:bold; margin-bottom:5px;"></div>
+        <div id="target-identity" style="font-size:12px; color:#888; margin-bottom:10px;"></div>
+        <div id="target-bio" style="font-size:14px; line-height:1.6; white-space:pre-wrap; background:#fff; padding:10px; border-radius:10px; border:1px solid #f0f0f0;"></div>
+        <div id="target-tags" class="tag-group" style="margin-top:15px;"></div>
+    </div>
+
+    <div class="stars"><span class="star" data-v="1">★</span><span class="star" data-v="2">★</span><span class="star" data-v="3">★</span><span class="star" data-v="4">★</span><span class="star" data-v="5">★</span></div>
     <button class="btn-p" onclick="submitRating()">送出評分</button>
+    <button onclick="logout()" style="width:100%; background:none; border:none; color:#bbb; font-size:12px; margin-top:20px; text-decoration:underline; cursor:pointer;">修改報名資料</button>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const cfg = { apiKey: "AIzaSyDv4EOEmJ8dfWgZEv5mYtaiXuzbwgjMAUA", authDomain: "jariah-match.firebaseapp.com", projectId: "jariah-match", storageBucket: "jariah-match.firebasestorage.app", messagingSenderId: "863372390147", appId: "1:863372390147:web:7541b1b478c33f3d824336" };
     const app = initializeApp(cfg); const db = getFirestore(app);
 
+    // 15個選項配置
+    const sOpts = ["平易近人", "直來直往", "慢熱內斂", "熱情奔放", "幽默風趣", "擅長傾聽", "觀察敏銳", "主導性強", "隨和體貼", "社交達人", "喜歡獨處", "誠實真摯", "圓滑周到", "充滿好奇", "氣場強大"];
+    const eOpts = ["理性冷靜", "感性細膩", "情緒穩定", "直覺敏銳", "樂觀積極", "溫柔體貼", "自我察覺高", "共情力強", "容易焦慮", "隨遇而安", "內心戲多", "剛毅堅強", "熱愛思考", "情感豐富", "容易感動"];
+    const vOpts = ["享受生活", "目標導向", "平凡是福", "冒險精神", "崇尚自由", "重視健康", "持續學習", "活在當下", "佔有慾強", "自律嚴謹", "追求卓越", "極簡主義", "重視家庭", "浪漫主義", "實踐主義"];
+
     let curId = 1, pts = ["", "", ""], myName = "", users = [], curIdx = 0, myRate = 0;
 
-    window.setPos = (id) => { curId = id; document.getElementById('fi').click(); };
+    window.onload = () => {
+        const render = (id, opts) => { document.getElementById(id).innerHTML = opts.map(o => `<span class="tag-btn" onclick="this.classList.toggle('active')">${o}</span>`).join(''); };
+        render('s-tags', sOpts); render('e-tags', eOpts); render('v-tags', vOpts);
+        
+        const urlP = new URLSearchParams(window.location.search);
+        if(urlP.get('u')) { localStorage.setItem('jariah_user', urlP.get('u')); window.history.replaceState({}, '', 'index.html'); }
+        const saved = localStorage.getItem('jariah_user');
+        if (saved) { myName = saved; document.getElementById('page-discovery').style.display = 'block'; fetchUsers(); checkMatchStatus(); setupTester(); }
+        else { document.getElementById('page-edit').style.display = 'block'; }
+    };
 
+    window.setPos = (id) => { curId = id; document.getElementById('fi').click(); };
     window.handleFile = (e) => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
+            const r = new FileReader();
+            r.onload = (ev) => {
                 const img = new Image();
                 img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let w = img.width, h = img.height, max = 400; // 壓縮解析度至 400px
+                    const cvs = document.createElement('canvas'); let w = img.width, h = img.height, max = 500;
                     if (w > h) { if (w > max) { h *= max / w; w = max; } } else { if (h > max) { w *= max / h; h = max; } }
-                    canvas.width = w; canvas.height = h;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, w, h); // 修正變數名稱
-                    const b64 = canvas.toDataURL('image/jpeg', 0.3); // 壓縮品質 0.3
-                    pts[curId - 1] = b64; // 修正變數名稱
-                    document.getElementById(`b-${curId}`).innerHTML = `<img src="${b64}">`;
-                    e.target.value = ""; 
+                    cvs.width = w; cvs.height = h; const ctx = cvs.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
+                    pts[curId - 1] = cvs.toDataURL('image/jpeg', 0.5); document.getElementById(`b-${curId}`).innerHTML = `<img src="${pts[curId - 1]}" style="width:100%;height:100%;object-fit:cover;">`;
                 };
                 img.src = ev.target.result;
             };
-            reader.readAsDataURL(file);
+            r.readAsDataURL(file);
         }
     };
 
     window.saveData = async () => {
-        myName = document.getElementById('nn').value;
-        const phone = document.getElementById('ph').value;
-        if(!myName || !phone || !pts[0]) return alert("請填完暱稱、電話並至少傳第一張照片");
-        
+        const n = document.getElementById('nn').value; const p = document.getElementById('ph').value;
+        if(!n || !p || !pts[0]) return alert("請填寫必填項並傳照片");
+        const getTs = (id, exId) => { let ts = Array.from(document.querySelectorAll(`#${id} .active`)).map(t=>t.innerText); if(document.getElementById(exId).value) ts.push(document.getElementById(exId).value); return ts; };
         try {
-            // 完整儲存邏輯
             await addDoc(collection(db, "users"), {
-                name: myName, phone: phone, photos: pts,
-                mbti: document.getElementById('mb').value,
-                job: document.getElementById('jb').value,
-                habits: Array.from(document.querySelectorAll('#ha .active')).map(t=>t.innerText),
-                createdAt: serverTimestamp()
+                name: n, phone: p, bio: document.getElementById('bi').value,
+                sTs: getTs('s-tags', 's-extra'), eTs: getTs('e-tags', 'e-extra'), vTs: getTs('v-tags', 'v-extra'),
+                orient: document.getElementById('orient').value, ident: document.getElementById('ident').value, stat: document.getElementById('stat').value,
+                photos: pts, createdAt: serverTimestamp()
             });
-            alert("🎉 報名成功！");
-            document.getElementById('page-edit').style.display = 'none';
-            document.getElementById('page-discovery').style.display = 'block';
-            fetchUsers();
-        } catch(e) {
-            let errorMsg = "系統忙碌中";
-            if (e.code === 'permission-denied') errorMsg = "【權限不足】請檢查 Firebase 規則是否已設為 true。";
-            else if (e.message.includes('exceeds')) errorMsg = "【照片太大了】即便壓縮後仍超過 1MB 限制。";
-            alert("❌ 失敗原因：" + errorMsg + "\n詳細代碼：" + e.message); //
-            console.error(e);
-        }
+            localStorage.setItem('jariah_user', n); location.reload();
+        } catch(e) { alert("儲存失敗"); }
     };
 
     async function fetchUsers() {
-        const snap = await getDocs(collection(db, "users"));
-        users = [];
-        snap.forEach(doc => { if(doc.data().name !== myName) users.push(doc.data()); });
+        const snap = await getDocs(query(collection(db, "users"), orderBy("createdAt", "desc")));
+        users = []; snap.forEach(doc => { if(doc.data().name !== myName) users.push(doc.data()); });
         showUser();
     }
 
     function showUser() {
-        if(curIdx >= users.length) { document.getElementById('target-name').innerText = "已看完全部對象"; return; }
+        if(curIdx >= users.length) { document.getElementById('target-name').innerText = "暫時沒人囉"; document.getElementById('target-photos').innerHTML = ""; return; }
         const u = users[curIdx];
         document.getElementById('target-name').innerText = u.name;
         document.getElementById('target-photos').innerHTML = u.photos.filter(p=>p).map(p=>`<img src="${p}">`).join('');
-        document.getElementById('target-info').innerHTML = `<b>MBTI:</b> ${u.mbti} | <b>職業:</b> ${u.job}<br><b>習慣:</b> ${u.habits.join(', ')}`;
+        document.getElementById('target-identity').innerText = `${u.orient||''} | ${u.ident||''} | ${u.stat||''}`;
+        document.getElementById('target-bio').innerText = u.bio || "這個人很神祕，什麼都沒寫...";
+        const all = [...(u.sTs||[]), ...(u.eTs||[]), ...(u.vTs||[])];
+        document.getElementById('target-tags').innerHTML = all.map(t => `<span class="tag-btn" style="cursor:default;">#${t}</span>`).join('');
         resetStars();
     }
 
     const stars = document.querySelectorAll('.star');
-    stars.forEach(s => s.onclick = () => {
-        myRate = parseInt(s.dataset.v);
-        stars.forEach(st => st.classList.toggle('active', st.dataset.v <= myRate));
-    });
-
+    stars.forEach(s => s.onclick = () => { myRate = parseInt(s.dataset.v); stars.forEach(st => st.classList.toggle('active', st.dataset.v <= myRate)); });
     function resetStars() { myRate = 0; stars.forEach(st => st.classList.remove('active')); }
 
     window.submitRating = async () => {
-        if(myRate === 0) return alert("請點擊星星評分");
-        if(myRate >= 4) {
-            await addDoc(collection(db, "matches"), { pair: [myName, users[curIdx].name], score: myRate, time: serverTimestamp() });
-        }
-        alert("已送出評分！"); curIdx++; showUser();
+        if(myRate === 0) return alert("請評分");
+        if(myRate >= 4) { await addDoc(collection(db, "matches"), { pair: [myName, users[curIdx].name], score: myRate, time: serverTimestamp() }); }
+        alert("評分成功！"); curIdx++; showUser(); checkMatchStatus();
     };
+
+    async function checkMatchStatus() {
+        const snap = await getDocs(query(collection(db, "matches"), where("pair", "array-contains", myName)));
+        let pairs = {}; snap.forEach(doc => { const d = doc.data(); let other = d.pair.find(n => n !== myName); if (!pairs[other]) pairs[other] = { score: 0, count: 0 }; pairs[other].score += d.score; pairs[other].count += 1; });
+        let finalM = Object.keys(pairs).filter(k => pairs[k].count === 2 && pairs[k].score >= 5).sort((a,b) => pairs[b].score - pairs[a].score).slice(0, 3);
+        const sUI = document.getElementById('match-status-ui'); const old = document.getElementById('old-man-img'); const mA = document.getElementById('success-match-area');
+        if (finalM.length > 0) {
+            sUI.innerHTML = `💖 恭喜！有 ${finalM.length} 位與妳互有好感`; old.style.display = 'none'; mA.style.display = 'block';
+            document.getElementById('match-list').innerHTML = finalM.map(m => `<div style="background:#fff;border:1px solid #eee;padding:12px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><b>${m}</b><span style="font-size:11px; color:#27ae60;">✨ 就在現場，快去找她吧！</span></div>`).join('');
+        } else { sUI.innerText = "✨ 轉借月下老人，緣分就在不遠處"; old.style.display = 'block'; mA.style.display = 'none'; }
+    }
+    window.logout = () => { localStorage.removeItem('jariah_user'); location.reload(); };
+    async function setupTester() {
+        const snap = await getDocs(collection(db, "users"));
+        let h = `<div style="position:fixed; bottom:5px; right:5px; background:rgba(0,0,0,0.5); padding:5px; border-radius:5px; z-index:999;"><select onchange="if(this.value){localStorage.setItem('jariah_user', this.value); location.reload();}" style="font-size:10px;"><option value="">快速切換身分</option>`;
+        snap.forEach(d => { h += `<option value="${d.data().name}">${d.data().name}</option>`; });
+        document.body.insertAdjacentHTML('beforeend', h + `</select></div>`);
+    }
 </script>
 </body>
 </html>
