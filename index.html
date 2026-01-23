@@ -17,30 +17,34 @@
         input, select, textarea { width: 100%; padding: 12px; border: 1.5px solid #FFCC80; border-radius: 12px; box-sizing: border-box; font-size: 16px; background: white; }
         textarea { min-height: 120px; }
 
-        .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .tag-checkbox { display: none; }
-        .tag-label { display: inline-block; padding: 8px 16px; border: 1.5px solid #FFCC80; border-radius: 20px; background: #FFF; color: #5D4037; cursor: pointer; font-size: 13px; transition: 0.2s; }
-        .tag-checkbox:checked + .tag-label { background: #FF8A80; color: white; border-color: #FF8A80; font-weight: bold; }
+        /* --- 註冊頁面的標籤樣式 (修正後確保顯示) --- */
+        .tag-selection-area { margin-top: 10px; }
+        .tag-category-title { font-size: 16px; color: #E64A19; font-weight: bold; margin-top: 15px; margin-bottom: 8px; border-bottom: 1px dashed #FFCC80; padding-bottom: 5px; }
+        .tag-container { display: flex; flex-wrap: wrap; gap: 8px; }
+        /* 隱藏原始 checkbox */
+        .tag-checkbox { position: absolute; opacity: 0; pointer-events: none; }
+        /* 標籤按鈕外觀 */
+        .tag-label { display: inline-block; padding: 8px 16px; border: 1.5px solid #FFCC80; border-radius: 20px; background: #FFF; color: #5D4037; cursor: pointer; font-size: 14px; transition: 0.2s; user-select: none; }
+        /* 選中時的樣式 */
+        .tag-checkbox:checked + .tag-label { background: #FF8A80; color: white; border-color: #FF8A80; font-weight: bold; transform: scale(1.05); }
+        /* 禁用時的樣式 */
         .tag-checkbox:disabled + .tag-label { opacity: 0.4; cursor: not-allowed; background: #EEE; }
 
-        .btn-main { width: 100%; padding: 18px; background: #E64A19; color: white; border: none; border-radius: 35px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-main { width: 100%; padding: 18px; background: #E64A19; color: white; border: none; border-radius: 35px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 30px; }
 
-        /* --- 卡片樣式 --- */
+        /* --- 配對頁面與卡片樣式 --- */
         #venue-page { position: relative; min-height: 600px; display: none; }
         .card-stack { position: relative; width: 100%; max-width: 500px; margin: 0 auto; }
         .card { background: white; border-radius: 20px; padding: 0; border: 1px solid #FFCC80; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: 0 auto; overflow: hidden; }
         
-        /* 卡片頭部 */
         .card-header-area { background: linear-gradient(135deg, #FFF3E0, #FFE0B2); padding: 20px; border-bottom: 1px solid #FFCC80; }
         .card-name { font-size: 28px; font-weight: bold; color: #E64A19; margin: 0; }
         .card-mbti { display: inline-block; background: #FF8A80; color: white; padding: 3px 10px; border-radius: 15px; font-size: 14px; font-weight: bold; margin-left: 10px; vertical-align: middle; }
         
-        /* 照片區 */
         .photo-scroll { display: flex; overflow-x: auto; padding: 10px; gap: 10px; background: #FAFAFA; scroll-behavior: smooth; }
         .photo-item { flex: 0 0 85%; aspect-ratio: 1/1; object-fit: cover; border-radius: 15px; border: 1px solid #DDD; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .no-photo { flex: 0 0 100%; height: 200px; display: flex; align-items: center; justify-content: center; background: #EEE; color: #999; border-radius: 15px; font-weight:bold; }
 
-        /* 內容區 */
         .card-body { padding: 20px; }
         .section-title { font-size: 18px; font-weight: bold; color: #5D4037; margin-top: 25px; margin-bottom: 12px; border-left: 5px solid #E64A19; padding-left: 10px; background: #FFF8E1; padding-top: 8px; padding-bottom: 8px; border-radius: 0 10px 10px 0; }
         .bio-text { font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; margin-bottom: 15px; background: #FAFAFA; padding: 15px; border-radius: 10px; border: 1px dashed #DDD; }
@@ -49,7 +53,7 @@
         .info-label { width: 90px; font-weight: bold; color: #E64A19; flex-shrink: 0; }
         .info-value { color: #333; flex-grow: 1; word-break: break-word; }
 
-        /* 標籤顯示 */
+        /* 配對頁面的彩色標籤顯示 */
         .tag-display-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
         .tag-badge { font-size: 13px; padding: 6px 12px; border-radius: 15px; color: white; display: inline-block; box-shadow: 1px 1px 3px rgba(0,0,0,0.1); }
         .tag-social { background: #FFB74D; }
@@ -59,7 +63,6 @@
         .tag-style { background: #BA68C8; }
         .tag-empty { color: #999; font-style: italic; font-size: 13px; padding: 5px; }
 
-        /* 按鈕區 */
         .action-area { padding: 20px; background: #FFF3E0; display: flex; flex-direction: column; align-items: center; gap: 15px; border-top: 1px solid #FFCC80; }
         .star-box { font-size: 36px; display: flex; gap: 15px; }
         .star-btn { cursor: pointer; transition: 0.2s; transform: scale(1); filter: grayscale(100%); opacity: 0.5; }
@@ -74,7 +77,7 @@
 </head>
 <body>
 
-<div id="loading-overlay">資料處理中...</div>
+<div id="loading-overlay">載入中...</div>
 
 <div class="container">
     <button class="logout-btn" onclick="logout()">切換身份</button>
@@ -135,7 +138,8 @@
         <div class="input-group"><label>其他興趣細節</label><textarea id="uHobby" placeholder="還有什麼？"></textarea></div>
 
         <h2>4. 標籤 (各區限選3個)</h2>
-        <div id="tag-box"></div>
+        <div id="tag-box-container"></div>
+        
         <button class="btn-main" onclick="register()">儲存並進入會場</button>
     </div>
 
@@ -151,9 +155,10 @@
 </div>
 
 <script>
-    // ⚠️ 這裡請填入您正確的 Google Apps Script 網址
+    // ⚠️ 1. 請填入您正確的 Google Apps Script 網址
     const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
 
+    // 2. 標籤資料定義 (立刻執行)
     const tagData = {
         social: ["熱情主動", "慢熱內斂", "幽默風趣", "優質傾聽", "直言不諱", "溫柔體貼", "獨立自主", "深度對話", "隨和隨興", "好奇心強", "觀察敏銳", "給予空間", "有主見", "不拘小節", "優雅得體"],
         emotion: ["感性細膩", "冷靜理智", "情緒穩定", "同理心強", "直覺敏銳", "樂觀積極", "內斂平靜", "情感充沛", "隨遇而安", "謹慎防備", "渴望共鳴", "自我覺察", "坦率大方", "安穩踏實", "追求成長"],
@@ -162,17 +167,70 @@
         style: ["歐美", "日系文青", "韓系溫柔", "街頭", "復古", "正式", "甜美", "中性帥氣", "運動", "波西米亞", "黑色系", "慵懶", "繽紛", "極簡", "山系"]
     };
 
-    const tBox = document.getElementById('tag-box');
-    Object.keys(tagData).forEach(key => {
-        let title = key==='social'?'社交':key==='emotion'?'情緒':key==='value'?'價值':key==='food'?'美食':key==='style'?'穿搭':'';
-        tBox.innerHTML += `<h3>${title}</h3><div class="tag-container" id="${key}-tags"></div>`;
-        const container = document.getElementById(`${key}-tags`);
-        const limitClass = (['social','emotion','value'].includes(key)) ? 'limit-3' : '';
-        tagData[key].forEach((t, i) => {
-            container.innerHTML += `<input type="checkbox" id="${key}-${i}" class="tag-checkbox ${limitClass}" value="${t}"><label for="${key}-${i}" class="tag-label">${t}</label>`;
-        });
-    });
+    // 3. 立刻產生標籤 HTML (確保畫面一出來就有選項)
+    function initTags() {
+        const containerBox = document.getElementById('tag-box-container');
+        if (!containerBox) return; // 保護機制
+        containerBox.innerHTML = ''; 
 
+        // 標籤對應的中文標題
+        const titles = {
+            social: '社交標籤',
+            emotion: '情緒標籤',
+            value: '價值觀',
+            food: '美食偏好',
+            style: '穿搭風格'
+        };
+
+        Object.keys(tagData).forEach(key => {
+            // 建立區塊
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'tag-selection-area';
+            
+            // 建立標題
+            const h3 = document.createElement('div');
+            h3.className = 'tag-category-title';
+            h3.innerText = titles[key] || key;
+            sectionDiv.appendChild(h3);
+
+            // 建立選項容器
+            const flexDiv = document.createElement('div');
+            flexDiv.className = 'tag-container';
+            flexDiv.id = `${key}-tags`; // 給予 ID 方便抓取
+
+            // 是否限制選3個
+            const limitClass = (['social','emotion','value'].includes(key)) ? 'limit-3' : '';
+
+            // 產生按鈕
+            tagData[key].forEach((t, i) => {
+                const uniqueId = `${key}-${i}`;
+                
+                // checkbox
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.id = uniqueId;
+                input.value = t;
+                input.className = `tag-checkbox ${limitClass}`;
+
+                // label
+                const label = document.createElement('label');
+                label.htmlFor = uniqueId;
+                label.className = 'tag-label';
+                label.innerText = t;
+
+                flexDiv.appendChild(input);
+                flexDiv.appendChild(label);
+            });
+
+            sectionDiv.appendChild(flexDiv);
+            containerBox.appendChild(sectionDiv);
+        });
+    }
+
+    // 🔥 立即執行產生標籤
+    initTags();
+
+    // 4. 監聽限制 (最多選3個)
     document.body.addEventListener('change', (e) => {
         if (e.target.classList.contains('limit-3')) {
             const group = e.target.parentElement;
@@ -181,10 +239,19 @@
         }
     });
 
-    if(localStorage.getItem('yueLaoUser')) showVenue();
+    // ----------------------------------------------------
+    // 以下是功能邏輯
+    // ----------------------------------------------------
+
+    if(localStorage.getItem('yueLaoUser')) {
+        showVenue();
+    } else {
+        document.getElementById('loading-overlay').style.display = 'none';
+    }
+
     function logout() { if(confirm('確定要切換身份嗎？')) { localStorage.removeItem('yueLaoUser'); location.reload(); } }
 
-    // 🔥 壓縮圖片轉文字 (免 Firebase)
+    // 圖片壓縮
     function compressImage(file) {
         return new Promise((resolve) => {
             if (!file) { resolve(""); return; }
@@ -205,25 +272,31 @@
                     canvas.width = width;
                     canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-                    resolve(dataUrl);
+                    resolve(canvas.toDataURL('image/jpeg', 0.6));
                 };
             };
         });
     }
 
+    // 註冊功能
     async function register() {
         const name = document.getElementById('uName').value;
         if(!name) return alert('請填寫名字');
         
         const overlay = document.getElementById('loading-overlay');
-        overlay.innerText = "資料處理中...\n(照片轉換需要一點時間)";
         overlay.style.display = 'block';
+        overlay.innerText = "資料處理中...";
 
         try {
             const p1Data = await compressImage(document.getElementById('file1').files[0]);
             const p2Data = await compressImage(document.getElementById('file2').files[0]);
             const p3Data = await compressImage(document.getElementById('file3').files[0]);
+
+            // 收集標籤資料
+            const getTags = (id) => {
+                const els = document.querySelectorAll(`#${id}-tags input:checked`);
+                return Array.from(els).map(el => el.value).join(',');
+            };
 
             const payload = {
                 action: "register",
@@ -237,25 +310,21 @@
             };
 
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-
             localStorage.setItem('yueLaoUser', name);
             showVenue();
-
         } catch(e) {
             overlay.style.display = 'none';
             alert("發生錯誤：" + e.message);
         }
     }
 
-    function getTags(id) { return Array.from(document.querySelectorAll(`#${id}-tags input:checked`)).map(el => el.value).join(','); }
-
     let venueData = [];
     let currentIndex = 0;
 
     async function showVenue() {
         const overlay = document.getElementById('loading-overlay');
-        overlay.innerText = "進入會場中...";
         overlay.style.display = 'block';
+        overlay.innerText = "進入會場中...";
         
         try {
             const res = await fetch(API_URL);
@@ -282,7 +351,7 @@
             overlay.style.display = 'none'; 
             document.getElementById('setup-page').style.display = 'none';
             document.getElementById('venue-page').style.display = 'block';
-            alert("讀取資料發生錯誤，請稍後重試。");
+            alert("讀取資料失敗，請稍後重試。");
         }
     }
 
@@ -293,11 +362,9 @@
         
         const u = venueData[currentIndex];
         
-        // 處理照片 (如果沒有照片，顯示灰色方塊)
         const renderImg = (src) => src ? `<img src="${src}" class="photo-item">` : '';
         const photosHtml = (u.p1 || u.p2 || u.p3) ? [u.p1, u.p2, u.p3].map(renderImg).join('') : '<div class="no-photo">無照片</div>';
 
-        // 處理標籤 (若空則顯示未填寫)
         const renderTags = (str, cls) => {
             if (!str || str === 'undefined' || str === '') return '<span class="tag-empty">(此人未選擇)</span>';
             return str.split(',').map(t => `<span class="tag-badge ${cls}">${t}</span>`).join('');
@@ -312,20 +379,47 @@
                         ${u.horo} / ${u.birth} / ${u.height}cm
                     </div>
                 </div>
-
-                <div class="photo-scroll">
-                    ${photosHtml}
-                </div>
-
+                <div class="photo-scroll">${photosHtml}</div>
                 <div class="card-body">
                     <div class="bio-text">${u.bio || "這個人很神秘，還沒寫自我介紹..."}</div>
-
                     <div class="section-title">基本檔案</div>
                     <div class="info-row"><div class="info-label">身份</div><div class="info-value">${u.gender}</div></div>
                     <div class="info-row"><div class="info-label">性取向</div><div class="info-value">${u.sex}</div></div>
                     <div class="info-row"><div class="info-label">感情狀態</div><div class="info-value">${u.status}</div></div>
                     <div class="info-row"><div class="info-label">關於寵物</div><div class="info-value">${u.pet}</div></div>
-
                     <div class="section-title">深入靈魂</div>
                     <div class="info-row" style="flex-direction:column;">
-                        <div class="info-label" style="width:100%;margin-bottom:5px;">💬 破冰回答 (${u.ice.split('
+                        <div class="info-label" style="width:100%;margin-bottom:5px;">💬 破冰回答 (${u.ice.split(']')[0].replace('[','')})</div>
+                        <div class="info-value" style="background:#FFF3E0; padding:10px; border-radius:10px;">${u.ice.split(']')[1] || u.ice}</div>
+                    </div>
+                    <div class="info-row"><div class="info-label">約會期待</div><div class="info-value">${u.date}</div></div>
+                    <div class="section-title">興趣喜好</div>
+                    <div class="info-row"><div class="info-label">電影</div><div class="info-value">${u.movie}</div></div>
+                    <div class="info-row"><div class="info-label">音樂</div><div class="info-value">${u.music}</div></div>
+                    <div class="info-row"><div class="info-label">運動</div><div class="info-value">${u.sport}</div></div>
+                    <div class="info-row"><div class="info-label">其他</div><div class="info-value">${u.hobby}</div></div>
+                    <div class="section-title">個性標籤</div>
+                    <div class="tag-display-group">${renderTags(u.tagSocial, 'tag-social')}</div>
+                    <div class="tag-display-group">${renderTags(u.tagEmotion, 'tag-emotion')}</div>
+                    <div class="tag-display-group">${renderTags(u.tagValue, 'tag-value')}</div>
+                    <div class="section-title">品味與風格</div>
+                    <div class="tag-display-group">${renderTags(u.tagFood, 'tag-food')}</div>
+                    <div class="tag-display-group">${renderTags(u.tagStyle, 'tag-style')}</div>
+                </div>
+                <div class="action-area">
+                    <div style="margin-bottom:10px; color:#E64A19; font-weight:bold;">給星星 (覺得有緣分嗎？)</div>
+                    <div class="star-box">${[1,2,3,4,5].map(i => `<div class="star-btn" onclick="handleRate('${u.name}', ${i})">⭐</div>`).join('')}</div>
+                    <button class="skip-btn" onclick="handleRate('${u.name}', 0)">略過</button>
+                </div>
+            </div>`;
+    }
+
+    async function handleRate(toUser, score) {
+        const container = document.getElementById('single-card-container');
+        container.innerHTML = `<div style="text-align:center; padding:50px; color:#E64A19; font-weight:bold;">傳送中... ❤️</div>`;
+        try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "rate", fromUser: localStorage.getItem('yueLaoUser'), toUser, stars: score }) }); } catch(e) {}
+        currentIndex++; setTimeout(renderCurrentCard, 500);
+    }
+</script>
+</body>
+</html>
