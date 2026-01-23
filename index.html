@@ -25,7 +25,7 @@
 
         .btn-main { width: 100%; padding: 18px; background: #E64A19; color: white; border: none; border-radius: 35px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
 
-        /* --- 卡片樣式大升級 --- */
+        /* --- 卡片樣式 --- */
         #venue-page { position: relative; min-height: 600px; display: none; }
         .card-stack { position: relative; width: 100%; max-width: 500px; margin: 0 auto; }
         .card { background: white; border-radius: 20px; padding: 0; border: 1px solid #FFCC80; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: 0 auto; overflow: hidden; }
@@ -38,25 +38,26 @@
         /* 照片區 */
         .photo-scroll { display: flex; overflow-x: auto; padding: 10px; gap: 10px; background: #FAFAFA; scroll-behavior: smooth; }
         .photo-item { flex: 0 0 85%; aspect-ratio: 1/1; object-fit: cover; border-radius: 15px; border: 1px solid #DDD; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .no-photo { flex: 0 0 100%; height: 200px; display: flex; align-items: center; justify-content: center; background: #EEE; color: #999; border-radius: 15px; }
+        .no-photo { flex: 0 0 100%; height: 200px; display: flex; align-items: center; justify-content: center; background: #EEE; color: #999; border-radius: 15px; font-weight:bold; }
 
         /* 內容區 */
         .card-body { padding: 20px; }
-        .section-title { font-size: 18px; font-weight: bold; color: #5D4037; margin-top: 20px; margin-bottom: 10px; border-left: 4px solid #E64A19; padding-left: 8px; background: #FFF8E1; padding-top: 5px; padding-bottom: 5px; }
-        .bio-text { font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; margin-bottom: 15px; }
+        .section-title { font-size: 18px; font-weight: bold; color: #5D4037; margin-top: 25px; margin-bottom: 12px; border-left: 5px solid #E64A19; padding-left: 10px; background: #FFF8E1; padding-top: 8px; padding-bottom: 8px; border-radius: 0 10px 10px 0; }
+        .bio-text { font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; margin-bottom: 15px; background: #FAFAFA; padding: 15px; border-radius: 10px; border: 1px dashed #DDD; }
         
-        .info-row { display: flex; margin-bottom: 8px; border-bottom: 1px dashed #EEE; padding-bottom: 5px; font-size: 15px; }
-        .info-label { width: 90px; font-weight: bold; color: #8D6E63; flex-shrink: 0; }
-        .info-value { color: #333; flex-grow: 1; }
+        .info-row { display: flex; margin-bottom: 10px; border-bottom: 1px dashed #EEE; padding-bottom: 8px; font-size: 15px; align-items: baseline; }
+        .info-label { width: 90px; font-weight: bold; color: #E64A19; flex-shrink: 0; }
+        .info-value { color: #333; flex-grow: 1; word-break: break-word; }
 
         /* 標籤顯示 */
-        .tag-display-group { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
-        .tag-badge { font-size: 12px; padding: 4px 10px; border-radius: 12px; color: white; display: inline-block; }
+        .tag-display-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+        .tag-badge { font-size: 13px; padding: 6px 12px; border-radius: 15px; color: white; display: inline-block; box-shadow: 1px 1px 3px rgba(0,0,0,0.1); }
         .tag-social { background: #FFB74D; }
         .tag-emotion { background: #90A4AE; }
         .tag-value { background: #81C784; }
         .tag-food { background: #FF8A65; }
         .tag-style { background: #BA68C8; }
+        .tag-empty { color: #999; font-style: italic; font-size: 13px; padding: 5px; }
 
         /* 按鈕區 */
         .action-area { padding: 20px; background: #FFF3E0; display: flex; flex-direction: column; align-items: center; gap: 15px; border-top: 1px solid #FFCC80; }
@@ -150,7 +151,7 @@
 </div>
 
 <script>
-    // ⚠️ 請確認這是您最新的 Google Apps Script 網址
+    // ⚠️ 這裡請填入您正確的 Google Apps Script 網址
     const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
 
     const tagData = {
@@ -195,22 +196,15 @@
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    
                     const MAX_WIDTH = 300;
                     const MAX_HEIGHT = 300;
                     let width = img.width;
                     let height = img.height;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                    } else {
-                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
-                    }
-                    
+                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
+                    else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
                     canvas.width = width;
                     canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
-                    
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
                     resolve(dataUrl);
                 };
@@ -288,7 +282,7 @@
             overlay.style.display = 'none'; 
             document.getElementById('setup-page').style.display = 'none';
             document.getElementById('venue-page').style.display = 'block';
-            alert("目前可能沒有其他資料，或網路不穩。");
+            alert("讀取資料發生錯誤，請稍後重試。");
         }
     }
 
@@ -301,10 +295,13 @@
         
         // 處理照片 (如果沒有照片，顯示灰色方塊)
         const renderImg = (src) => src ? `<img src="${src}" class="photo-item">` : '';
-        const photosHtml = [u.p1, u.p2, u.p3].map(renderImg).join('') || '<div class="no-photo">無照片</div>';
+        const photosHtml = (u.p1 || u.p2 || u.p3) ? [u.p1, u.p2, u.p3].map(renderImg).join('') : '<div class="no-photo">無照片</div>';
 
-        // 處理標籤
-        const renderTags = (str, cls) => str ? str.split(',').map(t => `<span class="tag-badge ${cls}">${t}</span>`).join('') : '';
+        // 處理標籤 (若空則顯示未填寫)
+        const renderTags = (str, cls) => {
+            if (!str || str === 'undefined' || str === '') return '<span class="tag-empty">(此人未選擇)</span>';
+            return str.split(',').map(t => `<span class="tag-badge ${cls}">${t}</span>`).join('');
+        };
 
         container.innerHTML = `
             <div class="card">
@@ -331,41 +328,4 @@
 
                     <div class="section-title">深入靈魂</div>
                     <div class="info-row" style="flex-direction:column;">
-                        <div class="info-label" style="width:100%;margin-bottom:5px;">💬 破冰回答 (${u.ice.split(']')[0].replace('[','')})</div>
-                        <div class="info-value" style="background:#FFF3E0; padding:10px; border-radius:10px;">${u.ice.split(']')[1] || u.ice}</div>
-                    </div>
-                    <div class="info-row"><div class="info-label">約會期待</div><div class="info-value">${u.date}</div></div>
-
-                    <div class="section-title">興趣喜好</div>
-                    <div class="info-row"><div class="info-label">電影</div><div class="info-value">${u.movie}</div></div>
-                    <div class="info-row"><div class="info-label">音樂</div><div class="info-value">${u.music}</div></div>
-                    <div class="info-row"><div class="info-label">運動</div><div class="info-value">${u.sport}</div></div>
-                    <div class="info-row"><div class="info-label">其他</div><div class="info-value">${u.hobby}</div></div>
-
-                    <div class="section-title">個性標籤</div>
-                    <div class="tag-display-group">${renderTags(u.tagSocial, 'tag-social')}</div>
-                    <div class="tag-display-group">${renderTags(u.tagEmotion, 'tag-emotion')}</div>
-                    <div class="tag-display-group">${renderTags(u.tagValue, 'tag-value')}</div>
-
-                    <div class="section-title">品味與風格</div>
-                    <div class="tag-display-group">${renderTags(u.tagFood, 'tag-food')}</div>
-                    <div class="tag-display-group">${renderTags(u.tagStyle, 'tag-style')}</div>
-                </div>
-
-                <div class="action-area">
-                    <div style="margin-bottom:10px; color:#E64A19; font-weight:bold;">給星星 (覺得有緣分嗎？)</div>
-                    <div class="star-box">${[1,2,3,4,5].map(i => `<div class="star-btn" onclick="handleRate('${u.name}', ${i})">⭐</div>`).join('')}</div>
-                    <button class="skip-btn" onclick="handleRate('${u.name}', 0)">略過</button>
-                </div>
-            </div>`;
-    }
-
-    async function handleRate(toUser, score) {
-        const container = document.getElementById('single-card-container');
-        container.innerHTML = `<div style="text-align:center; padding:50px; color:#E64A19; font-weight:bold;">傳送中... ❤️</div>`;
-        try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "rate", fromUser: localStorage.getItem('yueLaoUser'), toUser, stars: score }) }); } catch(e) {}
-        currentIndex++; setTimeout(renderCurrentCard, 500);
-    }
-</script>
-</body>
-</html>
+                        <div class="info-label" style="width:100%;margin-bottom:5px;">💬 破冰回答 (${u.ice.split('
