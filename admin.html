@@ -14,14 +14,12 @@
         .logout-btn { position: absolute; top: 20px; right: 20px; background: #8D6E63; color: white; border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; font-size: 13px; z-index: 10; }
         h1 { color: #E64A19; text-align: center; font-size: 32px; margin-bottom: 5px; }
         h2 { border-left: 5px solid #E64A19; padding-left: 10px; color: #5D4037; font-size: 20px; margin-top: 35px; background: #FFECB3; padding: 5px; border-radius: 5px; }
-        h3 { font-size: 16px; margin-top: 20px; color: #D84315; border-bottom: 1px dashed #FFCC80; padding-bottom: 5px; }
 
         .input-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; }
         input, select, textarea { width: 100%; padding: 12px; border: 1.5px solid #FFCC80; border-radius: 12px; box-sizing: border-box; font-size: 16px; background: white; }
         textarea { min-height: 120px; }
 
-        /* 標籤樣式 */
         .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .tag-checkbox { display: none; }
         .tag-label { display: inline-block; padding: 8px 16px; border: 1.5px solid #FFCC80; border-radius: 20px; background: #FFF; color: #5D4037; cursor: pointer; font-size: 13px; transition: 0.2s; }
@@ -30,158 +28,94 @@
 
         .btn-main { width: 100%; padding: 18px; background: #E64A19; color: white; border: none; border-radius: 35px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
 
-        /* --- 單張卡片模式專用樣式 --- */
+        /* 單張卡片樣式 */
         #venue-page { position: relative; min-height: 600px; display: none; }
-        
-        /* 卡片置中堆疊 */
         .card-stack { position: relative; width: 100%; max-width: 500px; margin: 0 auto; }
-        
-        .card { 
-            background: white; border-radius: 20px; padding: 25px; 
-            border: 1px solid #FFCC80; text-align: left; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            margin: 0 auto; /* 確保卡片置中 */
-        }
-
+        .card { background: white; border-radius: 20px; padding: 25px; border: 1px solid #FFCC80; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: 0 auto; }
         .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FFF3E0; padding-bottom: 10px; margin-bottom: 15px; }
         .card-name { font-size: 24px; font-weight: bold; color: #E64A19; margin: 0; }
         .card-mbti { background: #FFECB3; color: #E64A19; padding: 5px 12px; border-radius: 10px; font-size: 15px; font-weight: bold; }
-
         .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
         .photo-item { aspect-ratio: 1/1; border-radius: 10px; border: 2px solid #FFCC80; object-fit: cover; width: 100%; background: #F5F5F5; }
-
         .card-bio { font-size: 16px; color: #3E2723; line-height: 1.6; background: #FFF8E1; padding: 15px; border-radius: 15px; margin-bottom: 20px; white-space: pre-wrap; border-left: 5px solid #E64A19; }
-        
         .card-detail { font-size: 14px; color: #666; margin-bottom: 8px; border-bottom: 1px dashed #EEE; padding-bottom: 5px; }
         .card-detail strong { color: #E64A19; margin-right: 5px; }
-
-        /* 底部操作區 (固定在卡片下方) */
-        .action-area { 
-            margin-top: 20px; padding-top: 15px; border-top: 2px solid #FFF3E0;
-            display: flex; flex-direction: column; align-items: center; gap: 15px;
-        }
+        
+        .action-area { margin-top: 20px; padding-top: 15px; border-top: 2px solid #FFF3E0; display: flex; flex-direction: column; align-items: center; gap: 15px; }
         .star-box { font-size: 36px; display: flex; gap: 10px; }
         .star-btn { cursor: pointer; color: #E0E0E0; transition: 0.2s; transform: scale(1); }
-        .star-btn:hover { transform: scale(1.2); }
         .star-btn.active { color: #FFC107; }
-        
-        .skip-btn { 
-            background: #CFD8DC; color: #546E7A; border: none; padding: 12px 30px; 
-            border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 14px;
-            width: 100%;
-        }
+        .skip-btn { background: #CFD8DC; color: #546E7A; border: none; padding: 12px 30px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; }
 
-        /* 配對成功通知 */
-        #match-notification {
-            display: none; background: #FFF3E0; border: 3px dashed #E64A19; border-radius: 15px;
-            padding: 20px; text-align: center; margin-bottom: 20px;
-        }
-
+        #match-notification { display: none; background: #FFF3E0; border: 3px dashed #E64A19; border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; }
         #fallback-box { text-align: center; display: none; margin-top: 50px; padding: 30px; background: #FFF3E0; border-radius: 20px; }
         #fallback-box img { width: 180px; border-radius: 50%; border: 4px solid #E64A19; margin-bottom: 15px; }
-
         #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); color: white; text-align: center; padding-top: 200px; z-index: 1000; font-weight: bold; font-size: 18px; }
     </style>
 </head>
 <body>
 
-<div id="loading-overlay">緣分連結中，請稍候...</div>
+<div id="loading-overlay">資料處理中...</div>
 
 <div class="container">
     <button class="logout-btn" onclick="logout()">切換身份</button>
     <h1>月下老人</h1>
-    <p style="text-align: center; color: #8D6E63; font-size: 14px; margin-bottom: 20px;">月霞酒吧專屬配對系統</p>
 
     <div id="setup-page">
         <h2>1. 靈魂自我介紹 (置頂)</h2>
+        <div class="input-group"><label>自我介紹</label><textarea id="uBio" placeholder="關於妳的故事..."></textarea></div>
         <div class="input-group">
-            <label>自我介紹</label>
-            <textarea id="uBio" placeholder="寫下關於妳的故事... (這段文字會顯示在卡片最顯眼的地方)"></textarea>
-        </div>
-        <div class="input-group">
-            <label>生活照 (請選擇 3 張真實照片)</label>
+            <label>生活照 (選三張)</label>
             <input type="file" id="file1" accept="image/*" style="margin-bottom:5px;">
             <input type="file" id="file2" accept="image/*" style="margin-bottom:5px;">
             <input type="file" id="file3" accept="image/*">
-            <p style="font-size: 12px; color: #8D6E63; margin-top:5px;">💡 照片將會上傳至雲端並顯示在妳的卡片上。</p>
         </div>
-
-        <div class="input-group"><label>妳的名字 / 暱稱</label><input type="text" id="uName"></div>
-        
-        <div class="input-group">
-            <label>基本資料</label>
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <input type="date" id="uBirth" style="flex:1;">
-                <input type="number" id="uHeight" placeholder="身高(cm)" style="flex:1;">
-            </div>
+        <div class="input-group"><label>妳的名字</label><input type="text" id="uName"></div>
+        <div class="input-group"><label>基本資料</label>
+            <div style="display:flex; gap:10px;"><input type="date" id="uBirth" style="flex:1;"><input type="number" id="uHeight" placeholder="cm" style="flex:1;"></div>
             <div style="display:flex; gap:10px; margin-top:10px;">
                 <select id="uHoro"><option>牡羊座</option><option>金牛座</option><option>雙子座</option><option>巨蟹座</option><option>獅子座</option><option>處女座</option><option>天秤座</option><option>天蠍座</option><option>射手座</option><option>摩羯座</option><option>水瓶座</option><option>雙魚座</option></select>
-                <select id="uMbti">
-                    <option value="">MBTI</option>
-                    <optgroup label="分析家"><option>INTJ 建築師</option><option>INTP 邏輯學家</option><option>ENTJ 指揮官</option><option>ENTP 辯論家</option></optgroup>
-                    <optgroup label="外交官"><option>INFJ 提倡者</option><option>INFP 調解者</option><option>ENFJ 主人公</option><option>ENFP 競選者</option></optgroup>
-                    <optgroup label="守護者"><option>ISTJ 物流師</option><option>ISFJ 守衛者</option><option>ESTJ 總管</option><option>ESFJ 執政官</option></optgroup>
-                    <optgroup label="探險家"><option>ISTP 鑒賞家</option><option>ISFP 探險家</option><option>ESTP 企業家</option><option>ESFP 表演者</option></optgroup>
-                </select>
+                <select id="uMbti"><option value="">MBTI</option><option>INTJ</option><option>INTP</option><option>ENTJ</option><option>ENTP</option><option>INFJ</option><option>INFP</option><option>ENFJ</option><option>ENFP</option><option>ISTJ</option><option>ISFJ</option><option>ESTJ</option><option>ESFJ</option><option>ISTP</option><option>ISFP</option><option>ESTP</option><option>ESFP</option></select>
             </div>
         </div>
-        <div class="input-group"><label>性別認同</label><select id="uGender"><option>女性</option><option>跨女</option><option>非二元</option><option>探索中</option></select></div>
-        <div class="input-group"><label>性取向</label><select id="uSex"><option>女同志</option><option>雙性戀</option><option>異性戀</option><option>泛性戀</option><option>無性戀</option></select></div>
-        <div class="input-group"><label>感情狀態</label><select id="uStatus"><option>單身</option><option>開放式關係</option><option>曖昧中</option><option>尋找穩定關係</option></select></div>
+        <div class="input-group"><label>身份</label><select id="uGender"><option>女性</option><option>跨女</option><option>非二元</option><option>探索中</option></select><select id="uSex" style="margin-top:5px;"><option>女同志</option><option>雙性戀</option><option>異性戀</option><option>泛性戀</option><option>無性戀</option></select><select id="uStatus" style="margin-top:5px;"><option>單身</option><option>開放式</option><option>曖昧中</option><option>穩定中</option></select></div>
 
         <h2>2. 個性與期待</h2>
         <div class="input-group">
             <label>破冰問題</label>
-            <select id="uIceQ" style="margin-bottom:8px;">
-                <option>如果不考慮金錢，妳最想去哪裡生活？</option>
-                <option>如果明天是世界末日，妳最後一餐想吃什麼？</option>
-                <option>妳理想中的完美週末是怎麼過的？</option>
-            </select>
+            <select id="uIceQ" style="margin-bottom:8px;"><option>如果不考慮金錢，妳最想去哪裡生活？</option><option>如果明天是世界末日，妳最後一餐想吃什麼？</option><option>妳理想中的完美週末是怎麼過的？</option></select>
             <textarea id="uIceA" placeholder="寫下妳的回答..." style="min-height:80px;"></textarea>
         </div>
-        
         <div class="input-group">
             <label>關於寵物</label>
-            <select id="uPet">
-                <option>貓派</option>
-                <option>狗派</option>
-                <option>都有 / 都喜歡</option>
-                <option>都沒有但喜歡</option>
-                <option>過敏中 / 不太親近</option>
-            </select>
+            <select id="uPet"><option>貓派</option><option>狗派</option><option>都有 / 都喜歡</option><option>都沒有但喜歡</option><option>過敏中 / 不太親近</option></select>
         </div>
-
         <div class="input-group"><label>約會期待</label><select id="uDate"><option>安靜喝咖啡</option><option>去看展覽</option><option>酒精路跑</option><option>看夜景</option><option>漫步公園</option><option>遊樂園冒險</option><option>手作工作坊</option><option>電影馬拉松</option><option>精緻法餐</option><option>密室逃脫</option></select></div>
 
         <h2>3. 興趣</h2>
-        <div class="input-group"><label>喜歡的電影</label><input type="text" id="uMovie" placeholder="例如：王家衛、恐怖片..."></div>
-        <div class="input-group"><label>喜歡的音樂</label><input type="text" id="uMusic" placeholder="例如：獨立樂團、K-POP..."></div>
-        <div class="input-group"><label>喜歡的運動</label><input type="text" id="uSport" placeholder="例如：爬山、潛水、瑜伽..."></div>
-        <div class="input-group"><label>其他興趣細節</label><textarea id="uHobby" placeholder="還有什麼其他熱愛的？"></textarea></div>
+        <div class="input-group"><label>喜歡的電影</label><input type="text" id="uMovie" placeholder="王家衛..."></div>
+        <div class="input-group"><label>喜歡的音樂</label><input type="text" id="uMusic" placeholder="獨立樂團..."></div>
+        <div class="input-group"><label>喜歡的運動</label><input type="text" id="uSport" placeholder="爬山..."></div>
+        <div class="input-group"><label>其他興趣細節</label><textarea id="uHobby" placeholder="還有什麼？"></textarea></div>
 
-        <h2>4. 妳的專屬標籤 (各區限選3個)</h2>
+        <h2>4. 標籤 (各區限選3個)</h2>
         <div id="tag-box"></div>
-
         <button class="btn-main" onclick="register()">儲存並進入會場</button>
     </div>
 
     <div id="venue-page">
         <div id="match-notification"></div>
-
-        <div class="card-stack" id="single-card-container">
-            </div>
-
+        <div class="card-stack" id="single-card-container"></div>
         <div id="fallback-box">
-            <img src="staff_old_man.jpg" alt="月老轉介">
-            <p style="color:#E64A19; font-weight:bold; font-size:18px;">「緣分正在酒吧微醺中...」</p>
-            <p style="font-size:14px; color:#8D6E63;">目前沒有更多對象了。<br>喝杯酒，讓現場月老親自為妳牽線吧！</p>
-            <button class="btn-main" style="background:#8D6E63; margin-top:15px;" onclick="location.reload()">重新整理</button>
+            <img src="staff_old_man.jpg">
+            <p style="color:#E64A19; font-weight:bold;">緣分微醺中...</p>
+            <button class="btn-main" style="background:#8D6E63;" onclick="location.reload()">重新整理</button>
         </div>
     </div>
 </div>
 
 <script>
-    // --- ⚠️ 妳的 Firebase Config (已自動填入) ---
+    // 1. Firebase 設定 (已確認正確)
     const firebaseConfig = {
         apiKey: "AIzaSyDv4EOEmJ8dFwgZEv5mYtaiXuzbwgjMAUA",
         authDomain: "jariah-match.firebaseapp.com",
@@ -191,11 +125,10 @@
         appId: "1:863372390147:web:7541b1b478c33f3d824336",
         measurementId: "G-GDNBERRJJ1"
     };
-    
-    // 初始化 Firebase
     firebase.initializeApp(firebaseConfig);
     const storage = firebase.storage();
 
+    // 2. 這是妳剛剛給我的 Apps Script 正確網址 (已自動填入)
     const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
 
     const tagData = {
@@ -208,7 +141,7 @@
 
     const tBox = document.getElementById('tag-box');
     Object.keys(tagData).forEach(key => {
-        let title = key==='social'?'社交風格':key==='emotion'?'情緒感受':key==='value'?'價值觀':key==='food'?'美食':key==='style'?'穿搭':'';
+        let title = key==='social'?'社交':key==='emotion'?'情緒':key==='value'?'價值':key==='food'?'美食':key==='style'?'穿搭':'';
         tBox.innerHTML += `<h3>${title}</h3><div class="tag-container" id="${key}-tags"></div>`;
         const container = document.getElementById(`${key}-tags`);
         const limitClass = (['social','emotion','value'].includes(key)) ? 'limit-3' : '';
@@ -226,13 +159,7 @@
     });
 
     if(localStorage.getItem('yueLaoUser')) showVenue();
-    
-    function logout() { 
-        if(confirm('確定要切換身份嗎？')) {
-            localStorage.removeItem('yueLaoUser'); 
-            location.reload(); 
-        }
-    }
+    function logout() { if(confirm('確定要切換身份嗎？')) { localStorage.removeItem('yueLaoUser'); location.reload(); } }
 
     async function uploadImage(file) {
         if (!file) return "";
@@ -240,70 +167,43 @@
             const ref = storage.ref('users/' + new Date().getTime() + '_' + file.name);
             await ref.put(file);
             return await ref.getDownloadURL();
-        } catch(e) {
-            console.error("圖片上傳失敗", e);
-            return ""; 
-        }
+        } catch(e) { console.error("上傳失敗", e); return ""; }
     }
 
     async function register() {
         const name = document.getElementById('uName').value;
         if(!name) return alert('請填寫名字');
-        
         document.getElementById('loading-overlay').style.display = 'block';
 
         const p1Url = await uploadImage(document.getElementById('file1').files[0]);
         const p2Url = await uploadImage(document.getElementById('file2').files[0]);
         const p3Url = await uploadImage(document.getElementById('file3').files[0]);
 
-        // 組合破冰
-        const iceQ = document.getElementById('uIceQ').value;
-        const iceA = document.getElementById('uIceA').value;
-        const combinedIce = `[${iceQ}] ${iceA}`;
-
         const payload = {
             action: "register",
-            uName: name, 
-            p1: p1Url, p2: p2Url, p3: p3Url,
-            uBio: document.getElementById('uBio').value, 
-            uBirth: document.getElementById('uBirth').value, 
-            uHeight: document.getElementById('uHeight').value, 
-            uHoro: document.getElementById('uHoro').value,
-            uMbti: document.getElementById('uMbti').value, 
-            uGender: document.getElementById('uGender').value,
-            uSex: document.getElementById('uSex').value, 
-            uStatus: document.getElementById('uStatus').value,
-            uIceA: combinedIce, 
-            uPet: document.getElementById('uPet').value,
-            uDate: document.getElementById('uDate').value,
-            uMovie: document.getElementById('uMovie').value,
-            uMusic: document.getElementById('uMusic').value,
-            uSport: document.getElementById('uSport').value,
-            uHobby: document.getElementById('uHobby').value,
-            tagSocial: Array.from(document.querySelectorAll('#social-tags input:checked')).map(el => el.value).join(','),
-            tagEmotion: Array.from(document.querySelectorAll('#emotion-tags input:checked')).map(el => el.value).join(','),
-            tagValue: Array.from(document.querySelectorAll('#value-tags input:checked')).map(el => el.value).join(','),
-            tagFood: Array.from(document.querySelectorAll('#food-tags input:checked')).map(el => el.value).join(','),
-            tagStyle: Array.from(document.querySelectorAll('#style-tags input:checked')).map(el => el.value).join(',')
+            uName: name, p1: p1Url, p2: p2Url, p3: p3Url,
+            uBio: document.getElementById('uBio').value, uBirth: document.getElementById('uBirth').value, uHeight: document.getElementById('uHeight').value, uHoro: document.getElementById('uHoro').value, uMbti: document.getElementById('uMbti').value, 
+            uGender: document.getElementById('uGender').value, uSex: document.getElementById('uSex').value, uStatus: document.getElementById('uStatus').value,
+            uIceA: `[${document.getElementById('uIceQ').value}] ${document.getElementById('uIceA').value}`, 
+            uPet: document.getElementById('uPet').value, uDate: document.getElementById('uDate').value,
+            uMovie: document.getElementById('uMovie').value, uMusic: document.getElementById('uMusic').value, uSport: document.getElementById('uSport').value, uHobby: document.getElementById('uHobby').value,
+            tagSocial: getTags('social'), tagEmotion: getTags('emotion'), tagValue: getTags('value'), tagFood: getTags('food'), tagStyle: getTags('style')
         };
-        
+
         try {
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
             localStorage.setItem('yueLaoUser', name);
             setTimeout(showVenue, 2000);
-        } catch(e) {
-            alert('傳送失敗，請檢查網路連線');
-            document.getElementById('loading-overlay').style.display = 'none';
-        }
+        } catch(e) { alert('連線失敗，請檢查網路'); document.getElementById('loading-overlay').style.display = 'none'; }
     }
 
-    // --- 單張卡片變數與邏輯 ---
+    function getTags(id) { return Array.from(document.querySelectorAll(`#${id}-tags input:checked`)).map(el => el.value).join(','); }
+
     let venueData = [];
     let currentIndex = 0;
 
     async function showVenue() {
         document.getElementById('loading-overlay').style.display = 'block';
-        
         try {
             const res = await fetch(API_URL);
             const data = await res.json();
@@ -314,111 +214,52 @@
             document.getElementById('venue-page').style.display = 'block';
             window.scrollTo(0,0);
 
-            // 1. 配對通知
             const myMatches = data.adminStats.filter(s => (s.p1 === me || s.p2 === me) && s.isMatch);
             const matchBox = document.getElementById('match-notification');
             if(myMatches.length > 0) {
                 matchBox.style.display = 'block';
-                matchBox.innerHTML = `<h3 style="margin:0;color:#E64A19;">💖 配對成功！</h3>` + 
-                    myMatches.map(m => {
-                        const p = (m.p1 === me) ? m.p2 : m.p1;
-                        return `<div style="font-weight:bold;margin-top:5px;">✨ 與 ${p} 默契 ${m.total} 分</div>`;
-                    }).join('');
-            } else {
-                matchBox.style.display = 'none';
-            }
+                matchBox.innerHTML = `<h3 style="margin:0;color:#E64A19;">💖 配對成功！</h3>` + myMatches.map(m => `<div style="font-weight:bold;margin-top:5px;">✨ 與 ${(m.p1 === me) ? m.p2 : m.p1} 默契 ${m.total} 分</div>`).join('');
+            } else { matchBox.style.display = 'none'; }
 
-            // 2. 準備佇列 (排除自己、排除已評)
             const ratedList = data.ratedHistory || {};
-            venueData = data.users.filter(u => {
-                if (u.name === me) return false; 
-                if (ratedList[me + "_" + u.name]) return false;
-                return true;
-            });
-
+            venueData = data.users.filter(u => u.name !== me && !ratedList[me + "_" + u.name]);
             currentIndex = 0;
             renderCurrentCard();
-
-        } catch(e) {
-            console.error(e);
-            alert("讀取資料失敗，請稍後再試");
-            document.getElementById('loading-overlay').style.display = 'none';
-        }
+        } catch(e) { console.error(e); alert("無法讀取資料，請檢查網路"); document.getElementById('loading-overlay').style.display = 'none'; }
     }
 
     function renderCurrentCard() {
         const container = document.getElementById('single-card-container');
-        const fallback = document.getElementById('fallback-box');
-
-        // 沒人可看了
-        if (currentIndex >= venueData.length) {
-            container.innerHTML = '';
-            fallback.style.display = 'block';
-            return;
-        }
-
-        fallback.style.display = 'none';
+        if (currentIndex >= venueData.length) { container.innerHTML = ''; document.getElementById('fallback-box').style.display = 'block'; return; }
+        document.getElementById('fallback-box').style.display = 'none';
+        
         const u = venueData[currentIndex];
-
-        // 照片處理
-        const img1 = u.p1 ? `<img src="${u.p1}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;">無照片</div>';
-        const img2 = u.p2 ? `<img src="${u.p2}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;">無照片</div>';
-        const img3 = u.p3 ? `<img src="${u.p3}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;">無照片</div>';
+        const img1 = u.p1 ? `<img src="${u.p1}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;">無</div>';
+        const img2 = u.p2 ? `<img src="${u.p2}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;">無</div>';
+        const img3 = u.p3 ? `<img src="${u.p3}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;">無</div>';
 
         container.innerHTML = `
             <div class="card">
-                <div class="card-header">
-                    <span class="card-name">${u.name} - ${u.horo}</span>
-                    <span class="card-mbti">${u.mbti}</span>
-                </div>
-
-                <div class="photo-grid">
-                    ${img1}${img2}${img3}
-                </div>
-
-                <div class="card-bio">${u.bio || "（这位朋友還沒寫自我介紹...）"}</div>
-
-                <div class="card-detail"><strong>基本：</strong>${u.birth || ''} / ${u.height || ''}cm / ${u.status || ''}</div>
-                <div class="card-detail"><strong>破冰：</strong>${u.ice || ''}</div>
-                <div class="card-detail"><strong>寵物：</strong>${u.pet || ''}</div>
-                <div class="card-detail"><strong>期待：</strong>${u.date || ''}</div>
-                <div class="card-detail"><strong>電影：</strong>${u.movie || '無'}</div>
-                <div class="card-detail"><strong>音樂：</strong>${u.music || '無'}</div>
-                <div class="card-detail"><strong>運動：</strong>${u.sport || '無'}</div>
-                <div class="card-detail"><strong>其他：</strong>${u.hobby || '無'}</div>
-
+                <div class="card-header"><span class="card-name">${u.name} - ${u.horo}</span><span class="card-mbti">${u.mbti}</span></div>
+                <div class="photo-grid">${img1}${img2}${img3}</div>
+                <div class="card-bio">${u.bio || "..."}</div>
+                <div class="card-detail"><strong>基本：</strong>${u.birth} / ${u.height}cm / ${u.status}</div>
+                <div class="card-detail"><strong>破冰：</strong>${u.ice}</div>
+                <div class="card-detail"><strong>寵物：</strong>${u.pet}</div>
+                <div class="card-detail"><strong>期待：</strong>${u.date}</div>
+                <div class="card-detail"><strong>興趣：</strong>${u.movie} / ${u.music} / ${u.sport}</div>
                 <div class="action-area">
-                    <div style="font-size:14px; color:#888; margin-bottom:5px;">給予心意 (點擊星星)</div>
-                    <div class="star-box">
-                        ${[1,2,3,4,5].map(i => `<span class="star-btn" onclick="handleRate('${u.name}', ${i})">★</span>`).join('')}
-                    </div>
-                    <div style="width:100%; margin-top:15px;">
-                        <button class="skip-btn" onclick="handleRate('${u.name}', 0)">略過這位</button>
-                    </div>
+                    <div class="star-box">${[1,2,3,4,5].map(i => `<span class="star-btn" onclick="handleRate('${u.name}', ${i})">★</span>`).join('')}</div>
+                    <button class="skip-btn" onclick="handleRate('${u.name}', 0)">略過</button>
                 </div>
-            </div>
-        `;
+            </div>`;
     }
 
     async function handleRate(toUser, score) {
-        const fromUser = localStorage.getItem('yueLaoUser');
-        
-        // 視覺回饋
         const container = document.getElementById('single-card-container');
-        container.innerHTML = `<div style="text-align:center; padding:50px; color:#E64A19; font-weight:bold;">心意傳送中... ❤️</div>`;
-
-        // 傳送
-        try {
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "rate", fromUser, toUser, stars: score }) });
-        } catch(e) {
-            console.error("評分失敗", e);
-        }
-
-        // 下一位
-        currentIndex++;
-        setTimeout(() => {
-            renderCurrentCard();
-        }, 500);
+        container.innerHTML = `<div style="text-align:center; padding:50px; color:#E64A19; font-weight:bold;">傳送中... ❤️</div>`;
+        try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "rate", fromUser: localStorage.getItem('yueLaoUser'), toUser, stars: score }) }); } catch(e) {}
+        currentIndex++; setTimeout(renderCurrentCard, 500);
     }
 </script>
 </body>
