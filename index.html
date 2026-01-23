@@ -5,13 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>月下老人 - 月霞酒吧</title>
     <style>
-        body { font-family: 'PingFang TC', sans-serif; background-color: #FFB74D; margin: 0; padding: 10px; color: #4E342E; }
+        body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #FFB74D; margin: 0; padding: 10px; color: #4E342E; }
         .container { max-width: 650px; margin: 10px auto; background-color: #FFF9F0; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; }
-        h1 { color: #E64A19; text-align: center; }
+        h1 { color: #E64A19; text-align: center; font-size: 32px; }
         .logout-btn { position: absolute; top: 20px; right: 20px; background: #8D6E63; color: white; border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; }
+        h2 { border-left: 5px solid #E64A19; padding-left: 10px; color: #5D4037; font-size: 20px; margin-top: 35px; background: #FFECB3; padding: 5px; border-radius: 5px; }
+        h3 { font-size: 16px; margin-top: 20px; color: #D84315; border-bottom: 1px dashed #FFCC80; padding-bottom: 5px; }
+        
         .input-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1.5px solid #FFCC80; border-radius: 12px; box-sizing: border-box; background: white; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1.5px solid #FFCC80; border-radius: 12px; box-sizing: border-box; font-size: 16px; background: white; }
+        textarea { min-height: 120px; }
+        
+        /* 修復標籤樣式：隱藏方塊，只顯示按鈕 */
+        .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .tag-checkbox { display: none; } /* 關鍵：把原始勾選框藏起來 */
+        .tag-label { 
+            display: inline-block; 
+            padding: 8px 16px; 
+            border: 1.5px solid #FFCC80; 
+            border-radius: 20px; 
+            background: #FFF; 
+            color: #5D4037;
+            cursor: pointer; 
+            font-size: 13px;
+            transition: 0.2s;
+        }
+        .tag-checkbox:checked + .tag-label { 
+            background: #FF8A80; 
+            color: white; 
+            border-color: #FF8A80; 
+            font-weight: bold;
+        }
+        .tag-checkbox:disabled + .tag-label {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #EEE;
+        }
+
         .btn-main { width: 100%; padding: 18px; background: #E64A19; color: white; border: none; border-radius: 35px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
         
         /* 卡片設計 */
@@ -20,18 +51,12 @@
         .star-box { font-size: 24px; }
         .star-btn { cursor: pointer; color: #DDD; padding: 0 2px; }
         .star-btn.active { color: gold; }
-        .skip-btn { background: #B0BEC5; color: white; border: none; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 12px; }
-        .rated-text { color: #8D6E63; font-weight: bold; display: none; background: #EEE; padding: 5px 10px; border-radius: 10px; font-size: 12px; }
+        .skip-btn { background: #B0BEC5; color: white; border: none; padding: 6px 14px; border-radius: 15px; cursor: pointer; font-size: 12px; }
+        .rated-text { color: #8D6E63; font-weight: bold; display: none; background: #EEE; padding: 5px 10px; border-radius: 10px; font-size: 12px; text-align: center; margin-top: 10px; }
 
-        #fallback-box { text-align: center; display: none; margin-top: 20px; }
-        #fallback-box img { width: 200px; border-radius: 50%; border: 4px solid #E64A19; }
+        #fallback-box { text-align: center; display: none; margin-top: 20px; padding: 20px; background: #FFF3E0; border-radius: 20px; }
+        #fallback-box img { width: 200px; border-radius: 50%; border: 4px solid #E64A19; margin-bottom: 15px; }
         #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white; text-align: center; padding-top: 200px; z-index: 1000; font-weight: bold; }
-        
-        /* 標籤樣式 */
-        .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .tag-checkbox { display: none; }
-        .tag-label { padding: 6px 12px; border: 1.5px solid #FFCC80; border-radius: 20px; background: #FFF; cursor: pointer; font-size: 12px; }
-        .tag-checkbox:checked + .tag-label { background: #FF8A80; color: white; border-color: #FF8A80; }
     </style>
 </head>
 <body>
@@ -43,42 +68,60 @@
     <h1>月下老人</h1>
 
     <div id="setup-page">
-        <h3>1. 基本資料</h3>
-        <div class="input-group"><label>名字</label><input type="text" id="uName"></div>
-        <div class="input-group"><label>自我介紹</label><textarea id="uBio" placeholder="關於妳..."></textarea></div>
+        <h2>1. 靈魂內心獨白 (置頂)</h2>
+        <div class="input-group">
+            <label>自我介紹</label>
+            <textarea id="uBio" placeholder="寫下關於妳的故事、靈魂，或是對這座酒吧的期待..."></textarea>
+        </div>
         <div class="input-group">
             <label>生活照 (選三張)</label>
-            <input type="file"><br><input type="file"><br><input type="file">
+            <input type="file" style="margin-bottom:5px;"><br><input type="file" style="margin-bottom:5px;"><br><input type="file">
+            <p style="font-size: 11px; color: #8D6E63; margin-top:5px;">💡 展現最真實的妳，讓命中注定的那個她能在月霞酒吧一眼認出妳喔。</p>
         </div>
+
+        <div class="input-group"><label>妳的名字 / 暱稱</label><input type="text" id="uName"></div>
         
         <div class="input-group">
+            <label>身高 / 星座 / MBTI</label>
             <div style="display:flex; gap:10px;">
-                <input type="number" id="uHeight" placeholder="身高">
+                <input type="number" id="uHeight" placeholder="cm">
                 <select id="uHoro"><option>牡羊座</option><option>金牛座</option><option>雙子座</option><option>巨蟹座</option><option>獅子座</option><option>處女座</option><option>天秤座</option><option>天蠍座</option><option>射手座</option><option>摩羯座</option><option>水瓶座</option><option>雙魚座</option></select>
                 <select id="uMbti">
-                    <option value="">MBTI</option>
-                    <option>INTJ 建築師</option><option>ENFP 競選者</option><option>INFP 調解者</option><option>INFJ 提倡者</option><option>ENTP 辯論家</option>
-                    <option>ESTJ 總管</option><option>ESFJ 執政官</option><option>ISTP 鑒賞家</option><option>ISFP 探險家</option>
+                    <option value="">請選擇</option>
+                    <optgroup label="分析家">
+                        <option>INTJ 建築師</option><option>INTP 邏輯學家</option><option>ENTJ 指揮官</option><option>ENTP 辯論家</option>
+                    </optgroup>
+                    <optgroup label="外交官">
+                        <option>INFJ 提倡者</option><option>INFP 調解者</option><option>ENFJ 主人公</option><option>ENFP 競選者</option>
+                    </optgroup>
+                    <optgroup label="守護者">
+                        <option>ISTJ 物流師</option><option>ISFJ 守衛者</option><option>ESTJ 總管</option><option>ESFJ 執政官</option>
+                    </optgroup>
+                    <optgroup label="探險家">
+                        <option>ISTP 鑒賞家</option><option>ISFP 探險家</option><option>ESTP 企業家</option><option>ESFP 表演者</option>
+                    </optgroup>
                 </select>
             </div>
         </div>
-        <div class="input-group"><label>性別</label><select id="uGender"><option>女性</option><option>跨女</option><option>非二元</option></select></div>
-        <div class="input-group"><label>性向</label><select id="uSex"><option>女同志</option><option>雙性戀</option><option>異性戀</option><option>泛性戀</option></select></div>
-        <div class="input-group"><label>狀態</label><select id="uStatus"><option>單身</option><option>開放式</option><option>曖昧中</option></select></div>
+        <div class="input-group"><label>性別認同</label><select id="uGender"><option>女性</option><option>跨女</option><option>非二元</option><option>探索中</option></select></div>
+        <div class="input-group"><label>性取向</label><select id="uSex"><option>女同志</option><option>雙性戀</option><option>異性戀</option><option>泛性戀</option><option>無性戀</option></select></div>
+        <div class="input-group"><label>感情狀態</label><select id="uStatus"><option>單身</option><option>開放式關係</option><option>曖昧中</option><option>尋找穩定關係</option></select></div>
 
-        <h3>2. 標籤與興趣</h3>
+        <h2>2. 妳的專屬標籤 (各區限選3個)</h2>
         <div id="tag-box"></div>
-        <div class="input-group" style="margin-top:20px;"><label>約會期待</label><select id="uDate"><option>喝咖啡</option><option>看展覽</option><option>喝酒</option><option>看夜景</option><option>散步</option></select></div>
-        <div class="input-group"><label>手寫興趣</label><textarea id="uHobby"></textarea></div>
+
+        <h2>3. 興趣與期待</h2>
+        <div class="input-group"><label>理想第一次約會</label><select id="uDate"><option>安靜喝咖啡</option><option>去看展覽</option><option>酒精路跑</option><option>看夜景</option><option>漫步公園</option><option>遊樂園冒險</option><option>手作工作坊</option><option>電影馬拉松</option><option>精緻法餐</option><option>密室逃脫</option></select></div>
+        <div class="input-group"><label>手寫興趣</label><textarea id="uHobby" style="min-height:80px;" placeholder="電影、音樂、運動..."></textarea></div>
 
         <button class="btn-main" onclick="register()">進入會場</button>
     </div>
 
     <div id="venue-page" style="display:none;">
         <div id="fallback-box">
-            <img src="staff_old_man.jpg" alt="月老">
-            <p style="color:#E64A19; font-weight:bold;">緣分正在釀造中...</p>
-            <p style="font-size:12px; color:#8D6E63;">暫無高度契合對象，請月老幫忙吧！</p>
+            <img src="staff_old_man.jpg" alt="月老轉介">
+            <p style="color:#E64A19; font-weight:bold; font-size:18px;">「緣分正在酒吧微醺中...」</p>
+            <p style="font-size:14px; color:#8D6E63;">目前尚無高度契合對象。<br>別擔心，先喝一杯，讓現場月老親自為妳牽線吧！</p>
         </div>
         <div id="user-cards"></div>
     </div>
@@ -87,14 +130,45 @@
 <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
 
-    // 簡化的標籤產生邏輯 (縮短代碼長度)
-    const tags = { social:["熱情","慢熱","幽默"], emotion:["感性","理智","穩定"], value:["事業","家庭","冒險"], food:["日式","韓式","火鍋"], style:["歐美","文青","街頭"] };
+    // 完整的 75 個標籤資料 (不縮減)
+    const tagData = {
+        social: ["熱情主動", "慢熱內斂", "幽默風趣", "優質傾聽", "直言不諱", "溫柔體貼", "獨立自主", "深度對話", "隨和隨興", "好奇心強", "觀察敏銳", "給予空間", "有主見", "不拘小節", "優雅得體"],
+        emotion: ["感性細膩", "冷靜理智", "情緒穩定", "同理心強", "直覺敏銳", "樂觀積極", "內斂平靜", "情感充沛", "隨遇而安", "謹慎防備", "渴望共鳴", "自我覺察", "坦率大方", "安穩踏實", "追求成長"],
+        value: ["事業優先", "重視家庭", "戶外冒險", "宅在家中", "極簡主義", "享樂生活", "藝術品味", "性別平權", "穩定安逸", "活在當下", "財務自由", "愛護動物", "儀式感", "自由不羈", "健康養生"],
+        food: ["日式", "義式", "美式", "韓式", "台式熱炒", "法式", "火鍋", "蔬食", "甜點", "小吃", "精釀啤酒", "深夜食堂", "異國香料", "海鮮", "咖啡"],
+        style: ["歐美", "日系文青", "韓系溫柔", "街頭", "復古", "正式", "甜美", "中性帥氣", "運動", "波西米亞", "黑色系", "慵懶", "繽紛", "極簡", "山系"]
+    };
+
+    // 渲染標籤
     const tBox = document.getElementById('tag-box');
-    Object.keys(tags).forEach(k => {
-        tBox.innerHTML += `<h4>${k}</h4><div class="tag-container" id="${k}-tags"></div>`;
-        tags[k].forEach((t,i) => {
-            document.getElementById(`${k}-tags`).innerHTML += `<input type="checkbox" id="${k}${i}" value="${t}"><label for="${k}${i}" class="tag-label">${t}</label>`;
+    Object.keys(tagData).forEach(key => {
+        let title = '';
+        if(key === 'social') title = '社交風格';
+        else if(key === 'emotion') title = '情緒感受';
+        else if(key === 'value') title = '生活價值觀';
+        else if(key === 'food') title = '美食喜好';
+        else if(key === 'style') title = '穿搭風格';
+
+        tBox.innerHTML += `<h3>${title}</h3><div class="tag-container" id="${key}-tags"></div>`;
+        const container = document.getElementById(`${key}-tags`);
+        const limitClass = (['social','emotion','value'].includes(key)) ? 'limit-3' : ''; // 前三區有限制
+        
+        tagData[key].forEach((t, i) => {
+            // 使用正確的 ID 綁定，確保樣式正確
+            container.innerHTML += `
+                <input type="checkbox" id="${key}-${i}" class="tag-checkbox ${limitClass}" value="${t}">
+                <label for="${key}-${i}" class="tag-label">${t}</label>
+            `;
         });
+    });
+
+    // 標籤限制邏輯 (3個)
+    document.body.addEventListener('change', (e) => {
+        if (e.target.classList.contains('limit-3')) {
+            const group = e.target.parentElement;
+            const checked = group.querySelectorAll('.limit-3:checked').length;
+            group.querySelectorAll('.limit-3:not(:checked)').forEach(cb => cb.disabled = (checked >= 3));
+        }
     });
 
     if(localStorage.getItem('yueLaoUser')) showVenue();
@@ -106,13 +180,24 @@
         document.getElementById('loading-overlay').style.display = 'block';
         
         const payload = {
-            action: "register", uName: name, uBio: document.getElementById('uBio').value, 
-            uBirth:'', uHeight: document.getElementById('uHeight').value, uHoro: document.getElementById('uHoro').value,
-            uMbti: document.getElementById('uMbti').value, uGender: document.getElementById('uGender').value,
-            uSex: document.getElementById('uSex').value, uStatus: document.getElementById('uStatus').value,
-            uDate: document.getElementById('uDate').value, uHobby: document.getElementById('uHobby').value,
-            tagSocial: '', tagEmotion: '', tagValue: '', tagFood: '', tagStyle: '' 
-            // 這裡為了版面省略了標籤抓取，妳原本的標籤抓取邏輯是對的，可以直接用
+            action: "register",
+            uName: name, 
+            uBio: document.getElementById('uBio').value, 
+            uBirth: '', // 網頁沒放生日，傳空值
+            uHeight: document.getElementById('uHeight').value, 
+            uHoro: document.getElementById('uHoro').value,
+            uMbti: document.getElementById('uMbti').value, 
+            uGender: document.getElementById('uGender').value,
+            uSex: document.getElementById('uSex').value, 
+            uStatus: document.getElementById('uStatus').value,
+            uDate: document.getElementById('uDate').value, 
+            uHobby: document.getElementById('uHobby').value,
+            // 抓取完整標籤
+            tagSocial: Array.from(document.querySelectorAll('#social-tags input:checked')).map(el => el.value).join(','),
+            tagEmotion: Array.from(document.querySelectorAll('#emotion-tags input:checked')).map(el => el.value).join(','),
+            tagValue: Array.from(document.querySelectorAll('#value-tags input:checked')).map(el => el.value).join(','),
+            tagFood: Array.from(document.querySelectorAll('#food-tags input:checked')).map(el => el.value).join(','),
+            tagStyle: Array.from(document.querySelectorAll('#style-tags input:checked')).map(el => el.value).join(',')
         };
         
         await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
@@ -132,7 +217,7 @@
         const cardBox = document.getElementById('user-cards');
         const fallback = document.getElementById('fallback-box');
 
-        // 妳的嚴格條件：總分>5 且 isMatch 為 true (雙方都給星)
+        // 嚴格配對：雙向給分 > 0 且 總分 > 5
         const myMatches = data.adminStats.filter(s => (s.p1 === me || s.p2 === me) && s.isMatch);
 
         cardBox.innerHTML = '';
@@ -149,13 +234,10 @@
             fallback.style.display = 'block';
         }
 
-        // 顯示其他用戶卡片
         const ratedList = data.ratedHistory || {};
         
         data.users.forEach(u => {
             if(u.name === me) return;
-            
-            // 檢查我是否已經評過這個人
             const hasRated = ratedList[me + "_" + u.name];
 
             cardBox.innerHTML += `
@@ -163,14 +245,12 @@
                     <p style="color:#8D6E63;font-style:italic;">「${u.bio}」</p>
                     <h3 style="margin:5px 0;color:#E64A19;">${u.name} (${u.horo})</h3>
                     <p>MBTI: ${u.mbti}</p>
-                    
                     <div class="action-area" id="action-${u.name}" style="display:${hasRated ? 'none' : 'flex'}">
                         <div class="star-box">
                             ${[1,2,3,4,5].map(i => `<span class="star-btn" onclick="rate('${u.name}', ${i})">★</span>`).join('')}
                         </div>
                         <button class="skip-btn" onclick="rate('${u.name}', 0)">略過</button>
                     </div>
-                    
                     <div class="rated-text" style="display:${hasRated ? 'block' : 'none'}">
                         ✅ 已送出心意
                     </div>
@@ -180,13 +260,13 @@
 
     async function rate(toUser, score) {
         const fromUser = localStorage.getItem('yueLaoUser');
-        // 視覺隱藏
         document.getElementById(`action-${toUser}`).style.display = 'none';
-        
+        // 為了讓使用者立刻有感，可以先顯示「已送出」
+        const card = document.getElementById(`action-${toUser}`).parentElement;
+        card.querySelector('.rated-text').style.display = 'block';
+
         await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "rate", fromUser, toUser, stars: score }) });
-        
-        // 雖然 Apps Script 會擋，但前端這裡直接顯示「已送出」讓體驗更好
-        setTimeout(showVenue, 1000);
+        // 不強制刷新整個畫面，只送出請求
     }
 </script>
 </body>
