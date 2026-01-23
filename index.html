@@ -5,28 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>月下老人 - 聯誼配對系統</title>
     <style>
-        /* --- 1. 核心視覺：橘黃色背景 --- */
-        body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #FFB74D; margin: 0; padding: 10px; color: #4E342E; }
+        /* --- 1. 核心視覺：妳指定的橘黃色主題 --- */
+        body { font-family: 'PingFang TC', sans-serif; background-color: #FFB74D; margin: 0; padding: 10px; color: #4E342E; }
         .container { max-width: 650px; margin: 10px auto; background-color: #FFF9F0; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         h1 { color: #E64A19; text-align: center; font-size: 32px; margin-bottom: 5px; }
         .subtitle { text-align: center; color: #8D6E63; margin-bottom: 25px; font-size: 14px; }
+        
         h2 { border-left: 5px solid #E64A19; padding-left: 10px; color: #5D4037; font-size: 20px; margin-top: 35px; background: #FFECB3; padding: 5px 10px; border-radius: 5px; }
         h3 { font-size: 17px; margin-top: 25px; color: #D84315; border-bottom: 1px solid #FFCC80; padding-bottom: 5px; }
+
+        .section { margin-bottom: 35px; }
         .input-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 15px; color: #5D4037; }
+
         input, select, textarea { width: 100%; padding: 12px; border: 1.5px solid #FFCC80; border-radius: 12px; font-size: 16px; box-sizing: border-box; background: white; }
         textarea { resize: vertical; min-height: 100px; }
+
+        /* MBTI 測試鈕 */
         .btn-test { display: inline-block; margin-top: 8px; padding: 8px 16px; background-color: #FB8C00; color: white; text-decoration: none; border-radius: 20px; font-size: 13px; font-weight: bold; }
+
+        /* 標籤視覺 */
         .tag-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
         .tag-checkbox { display: none; }
         .tag-label { display: inline-block; padding: 7px 14px; border: 1.5px solid #FFCC80; border-radius: 20px; background-color: #FFF; color: #5D4037; cursor: pointer; font-size: 13px; transition: 0.2s; }
         .tag-checkbox:checked + .tag-label { background-color: #FF8A80; color: white; border-color: #FF8A80; }
         .tag-checkbox:disabled + .tag-label { opacity: 0.3; cursor: not-allowed; }
+
         .btn-main { width: 100%; padding: 18px; background-color: #E64A19; color: white; border: none; border-radius: 35px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 30px; box-shadow: 0 4px 15px rgba(230,74,25,0.3); }
-        .card { background: white; border-radius: 20px; padding: 20px; margin-top: 20px; border: 1px solid #FFCC80; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: left; }
+        .card { background: white; border-radius: 20px; padding: 20px; margin-top: 20px; border: 1px solid #FFCC80; text-align: left; }
+        #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white; text-align: center; padding-top: 200px; z-index: 1000; font-weight: bold; }
     </style>
 </head>
 <body>
+
+<div id="loading-overlay">正在為妳連結緣分資料庫...</div>
 
 <div class="container">
     <h1>月下老人</h1>
@@ -35,36 +47,45 @@
     <div id="setup-page">
         <div class="section">
             <h2>1. 基本硬性資料</h2>
+            
             <div class="input-group">
                 <label>生活照 (最多三張)</label>
-                <input type="file" id="pic1" accept="image/*" style="margin-bottom:8px;">
-                <input type="file" id="pic2" accept="image/*" style="margin-bottom:8px;">
-                <input type="file" id="pic3" accept="image/*">
+                <input type="file" accept="image/*" style="margin-bottom:8px;"><br>
+                <input type="file" accept="image/*" style="margin-bottom:8px;"><br>
+                <input type="file" accept="image/*">
                 <p style="font-size: 12px; color: #8D6E63; margin-top: 5px;">💡 展現最真實的妳，讓命中注定的對象能一眼認出妳喔。</p>
             </div>
+
             <div class="input-group">
                 <label>妳的名字 / 暱稱</label>
                 <input type="text" id="userName" placeholder="如何稱呼妳？">
             </div>
+
             <div class="input-group">
                 <label>自我介紹 (開放式填寫)</label>
-                <textarea id="userBio" placeholder="關於妳的故事、興趣，或是期待..."></textarea>
+                <textarea id="userBio" placeholder="寫下妳的故事、興趣，或是對另一半的期待..."></textarea>
             </div>
+
             <div class="input-group">
                 <label>出生年月日 (含年份)</label>
                 <input type="date" id="birthDate">
             </div>
+
             <div class="input-group">
                 <label>身高 (cm)</label>
-                <input type="number" id="heightInput" min="100" max="220" placeholder="100 - 220">
+                <input type="number" id="heightInput" min="100" max="220" placeholder="範圍：100 - 220">
             </div>
+
             <div class="input-group">
                 <label>星座</label>
                 <select id="horoscopeSelect">
                     <option value="" disabled selected>請選擇</option>
-                    <option>牡羊座</option><option>金牛座</option><option>雙子座</option><option>巨蟹座</option><option>獅子座</option><option>處女座</option><option>天秤座</option><option>天蠍座</option><option>射手座</option><option>摩羯座</option><option>水瓶座</option><option>雙魚座</option>
+                    <option>牡羊座</option><option>金牛座</option><option>雙子座</option><option>巨蟹座</option>
+                    <option>獅子座</option><option>處女座</option><option>天秤座</option><option>天蠍座</option>
+                    <option>射手座</option><option>摩羯座</option><option>水瓶座</option><option>雙魚座</option>
                 </select>
             </div>
+
             <div class="input-group">
                 <label>性別認同 (單選)</label>
                 <select id="genderIdentity">
@@ -72,6 +93,7 @@
                     <option>女性</option><option>跨女</option><option>非二元/性別流動</option><option>探索中</option>
                 </select>
             </div>
+
             <div class="input-group">
                 <label>性取向 (單選)</label>
                 <select id="sexualOrientation">
@@ -79,6 +101,7 @@
                     <option>女同志</option><option>雙性戀</option><option>異性戀</option><option>泛性戀</option><option>無性戀</option>
                 </select>
             </div>
+
             <div class="input-group">
                 <label>感情狀態 (單選)</label>
                 <select id="relStatus">
@@ -86,6 +109,7 @@
                     <option>單身</option><option>開放式關係</option><option>曖昧中</option><option>尋找穩定關係</option>
                 </select>
             </div>
+
             <div class="input-group">
                 <label>MBTI 人格類型</label>
                 <a href="https://www.16personalities.com/tw/%E4%BA%BA%E6%A0%BC%E6%B8%AC%E8%A9%A6" target="_blank" class="btn-test">點我測試 MBTI</a>
@@ -108,7 +132,7 @@
         </div>
 
         <div class="section">
-            <h2>2. 生活感與期待</h2>
+            <h2>2. 生活感與約會期待</h2>
             <div class="input-group">
                 <label>破冰問句 (三選一填寫)</label>
                 <select id="iceQ"><option>如果不考慮錢，我最想去的地方是...</option><option>我的理想週末通常是這樣過的...</option><option>如果明天是世界末日，最後一餐要吃...</option></select>
@@ -121,7 +145,9 @@
             <div class="input-group">
                 <label>理想的第一次約會 (10個選項)</label>
                 <select id="datePref">
-                    <option>安靜喝咖啡</option><option>去看展覽</option><option>酒精路跑</option><option>看夜景</option><option>漫步公園</option><option>遊樂園冒險</option><option>手作工作坊</option><option>電影馬拉松</option><option>精緻法餐</option><option>密室逃脫</option>
+                    <option>安靜喝咖啡</option><option>去看展覽</option><option>酒精路跑</option><option>看夜景</option>
+                    <option>漫步公園</option><option>遊樂園冒險</option><option>手作工作坊</option><option>電影馬拉松</option>
+                    <option>精緻法餐</option><option>密室逃脫</option>
                 </select>
             </div>
         </div>
@@ -157,33 +183,35 @@
 </div>
 
 <script>
+    // 這裡就是妳的專屬連網門牌
     const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
 
     const tagData = {
         social: ["熱情主動", "慢熱內斂", "幽默風趣", "優質傾聽", "直言不諱", "溫柔體貼", "獨立自主", "深度對話", "隨和隨興", "好奇心強", "觀察敏銳", "給予空間", "有主見", "不拘小節", "優雅得體"],
         emotion: ["感性細膩", "冷靜理智", "情緒穩定", "同理心強", "直覺敏銳", "樂觀積極", "內斂平靜", "情感充沛", "隨遇而安", "謹慎防備", "渴望共鳴", "自我覺察", "坦率大方", "安穩踏實", "追求成長"],
-        value: ["事業優先", "重視家庭", "戶外冒險", "宅在家中", "極簡主義", "享樂生活", "藝術品味", "性別平權", "穩定安逸", "活在當下", "財務自由", "愛護動物", "儀式感", "自由不羈", "健康養生"],
+        value: ["事業優先", "重視家庭", "戶外冒險", "宅在家中", "極簡主義", "享樂生活", "藝術品味", "性別平權", "穩定安逸", "活在當下", "財務自由", "愛護動物", "生活儀式感", "自由不羈", "健康養生"],
         food: ["日式", "義式", "美式", "韓式", "台式熱炒", "法式", "火鍋", "蔬食", "甜點", "小吃", "精釀啤酒", "深夜食堂", "異國香料", "海鮮", "咖啡"],
         style: ["歐美", "日系文青", "韓系溫柔", "街頭", "復古", "正式", "甜美", "中性帥氣", "運動", "波西米亞", "黑色系", "慵懶", "繽紛", "極簡", "山系"]
     };
 
     function renderTags(id, list, container, limit) {
         list.forEach((item, i) => {
-            container.innerHTML += `<input type="checkbox" id="${id}-${i}" class="tag-checkbox ${limit}" value="${item}">
-                                    <label for="${id}-${i}" class="tag-label">${item}</label>`;
+            const tagId = `${id}-${i}`;
+            container.innerHTML += `<input type="checkbox" id="${tagId}" class="tag-checkbox ${limit}" value="${item}">
+                                    <label for="${tagId}" class="tag-label">${item}</label>`;
         });
     }
 
     const tagSec = document.getElementById('tag-sections');
-    ['social', 'emotion', 'value'].forEach(type => {
-        tagSec.innerHTML += `<h3>${type === 'social' ? '社交風格' : type === 'emotion' ? '情緒感受' : '生活價值觀'}</h3><div class="tag-container" id="${type}-tags"></div>`;
-        renderTags(type, tagData[type], document.getElementById(`${type}-tags`), 'limit-3');
+    ['social', 'emotion', 'value'].forEach(t => {
+        tagSec.innerHTML += `<h3>${t==='social'?'社交與互動':t==='emotion'?'情緒與感受':'生活價值觀'}</h3><div class="tag-container" id="${t}-tags"></div>`;
+        renderTags(t, tagData[t], document.getElementById(`${t}-tags`), 'limit-3');
     });
 
     const prefSec = document.getElementById('pref-tags');
-    ['food', 'style'].forEach(type => {
-        prefSec.innerHTML += `<h3>${type === 'food' ? '美食喜好' : '穿衣風格'}</h3><div class="tag-container" id="${type}-tags"></div>`;
-        renderTags(type, tagData[type], document.getElementById(`${type}-tags`), '');
+    ['food', 'style'].forEach(t => {
+        prefSec.innerHTML += `<h3>${t==='food'?'美食喜好':'穿衣風格'}</h3><div class="tag-container" id="${t}-tags"></div>`;
+        renderTags(t, tagData[t], document.getElementById(`${t}-tags`), '');
     });
 
     document.body.addEventListener('change', (e) => {
@@ -196,6 +224,8 @@
 
     async function sendToCloud() {
         if(!document.getElementById('userName').value) return alert('請填寫名字');
+        document.getElementById('loading-overlay').style.display = 'block';
+
         const payload = {
             userName: document.getElementById('userName').value,
             bio: document.getElementById('userBio').value,
@@ -212,27 +242,48 @@
             social: Array.from(document.querySelectorAll('#social-tags input:checked')).map(el => el.value).join(','),
             emotion: Array.from(document.querySelectorAll('#emotion-tags input:checked')).map(el => el.value).join(','),
             value: Array.from(document.querySelectorAll('#value-tags input:checked')).map(el => el.value).join(','),
-            hobbies: document.getElementById('hobby').value,
+            hobbies: `${document.getElementById('movie').value}|${document.getElementById('hobby').value}`,
             food: Array.from(document.querySelectorAll('#food-tags input:checked')).map(el => el.value).join(','),
             style: Array.from(document.querySelectorAll('#style-tags input:checked')).map(el => el.value).join(',')
         };
-        await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-        loadVenue();
+
+        try {
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        } catch (e) { console.log("傳送中..."); }
+
+        setTimeout(loadVenue, 1500);
     }
 
     async function loadVenue() {
+        document.getElementById('loading-overlay').style.display = 'none';
         document.getElementById('setup-page').style.display = 'none';
         document.getElementById('venue-page').style.display = 'block';
-        window.scrollTo(0,0);
-        const res = await fetch(API_URL);
-        const users = await res.json();
-        const listDiv = document.getElementById('userList');
-        listDiv.innerHTML = '';
-        users.forEach(u => {
-            if(u.name !== document.getElementById('userName').value) {
-                listDiv.innerHTML += `<div class="card"><h3>${u.name} - ${u.horoscope}</h3><p><strong>MBTI:</strong> ${u.mbti}</p><p>${u.bio}</p><div style="color: gold; font-size: 20px; cursor: pointer;">★ ★ ★ ★ ★ (評分)</div></div>`;
+        window.scrollTo(0, 0);
+
+        try {
+            const res = await fetch(API_URL);
+            const users = await res.json();
+            const listDiv = document.getElementById('userList');
+            listDiv.innerHTML = '';
+            
+            const others = users.filter(u => u.name !== document.getElementById('userName').value);
+
+            if(others.length === 0) {
+                listDiv.innerHTML = '<div class="card"><p style="text-align:center;">🌟 目前會場還沒有其他緣分，快邀請朋友來填寫吧！</p></div>';
+            } else {
+                others.forEach(u => {
+                    listDiv.innerHTML += `
+                        <div class="card">
+                            <h3>${u.name} - ${u.horoscope}</h3>
+                            <p><strong>MBTI:</strong> ${u.mbti}</p>
+                            <p>${u.bio}</p>
+                            <div style="color: gold; font-size: 22px; cursor: pointer;">★ ★ ★ ★ ★</div>
+                        </div>`;
+                });
             }
-        });
+        } catch (e) {
+            document.getElementById('userList').innerHTML = '<div class="card"><p>讀取名單失敗，請確認 Google 試算表權限。</p></div>';
+        }
     }
 </script>
 </body>
