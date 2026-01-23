@@ -17,22 +17,18 @@
         input, select, textarea { width: 100%; padding: 12px; border: 1.5px solid #FFCC80; border-radius: 12px; box-sizing: border-box; font-size: 16px; background: white; }
         textarea { min-height: 120px; }
 
-        /* --- 註冊頁面的標籤樣式 (修正後確保顯示) --- */
-        .tag-selection-area { margin-top: 10px; }
-        .tag-category-title { font-size: 16px; color: #E64A19; font-weight: bold; margin-top: 15px; margin-bottom: 8px; border-bottom: 1px dashed #FFCC80; padding-bottom: 5px; }
+        /* 標籤選單樣式 */
+        .tag-block { margin-bottom: 20px; }
+        .tag-category-header { font-size: 15px; color: #E64A19; font-weight:bold; margin-bottom: 8px; border-bottom: 1px dashed #FFCC80; padding-bottom: 5px; }
         .tag-container { display: flex; flex-wrap: wrap; gap: 8px; }
-        /* 隱藏原始 checkbox */
-        .tag-checkbox { position: absolute; opacity: 0; pointer-events: none; }
-        /* 標籤按鈕外觀 */
-        .tag-label { display: inline-block; padding: 8px 16px; border: 1.5px solid #FFCC80; border-radius: 20px; background: #FFF; color: #5D4037; cursor: pointer; font-size: 14px; transition: 0.2s; user-select: none; }
-        /* 選中時的樣式 */
+        .tag-checkbox { display: none; }
+        .tag-label { display: inline-block; padding: 8px 16px; border: 1.5px solid #FFCC80; border-radius: 20px; background: #FFF; color: #5D4037; cursor: pointer; font-size: 13px; transition: 0.2s; user-select: none; }
         .tag-checkbox:checked + .tag-label { background: #FF8A80; color: white; border-color: #FF8A80; font-weight: bold; transform: scale(1.05); }
-        /* 禁用時的樣式 */
         .tag-checkbox:disabled + .tag-label { opacity: 0.4; cursor: not-allowed; background: #EEE; }
 
-        .btn-main { width: 100%; padding: 18px; background: #E64A19; color: white; border: none; border-radius: 35px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 30px; }
+        .btn-main { width: 100%; padding: 18px; background: #E64A19; color: white; border: none; border-radius: 35px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
 
-        /* --- 配對頁面與卡片樣式 --- */
+        /* 卡片與配對頁面樣式 */
         #venue-page { position: relative; min-height: 600px; display: none; }
         .card-stack { position: relative; width: 100%; max-width: 500px; margin: 0 auto; }
         .card { background: white; border-radius: 20px; padding: 0; border: 1px solid #FFCC80; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: 0 auto; overflow: hidden; }
@@ -53,7 +49,7 @@
         .info-label { width: 90px; font-weight: bold; color: #E64A19; flex-shrink: 0; }
         .info-value { color: #333; flex-grow: 1; word-break: break-word; }
 
-        /* 配對頁面的彩色標籤顯示 */
+        /* 標籤顯示樣式 */
         .tag-display-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
         .tag-badge { font-size: 13px; padding: 6px 12px; border-radius: 15px; color: white; display: inline-block; box-shadow: 1px 1px 3px rgba(0,0,0,0.1); }
         .tag-social { background: #FFB74D; }
@@ -139,7 +135,7 @@
 
         <h2>4. 標籤 (各區限選3個)</h2>
         <div id="tag-box-container"></div>
-        
+
         <button class="btn-main" onclick="register()">儲存並進入會場</button>
     </div>
 
@@ -155,82 +151,37 @@
 </div>
 
 <script>
-    // ⚠️ 1. 請填入您正確的 Google Apps Script 網址
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
-
-    // 2. 標籤資料定義 (立刻執行)
-    const tagData = {
-        social: ["熱情主動", "慢熱內斂", "幽默風趣", "優質傾聽", "直言不諱", "溫柔體貼", "獨立自主", "深度對話", "隨和隨興", "好奇心強", "觀察敏銳", "給予空間", "有主見", "不拘小節", "優雅得體"],
-        emotion: ["感性細膩", "冷靜理智", "情緒穩定", "同理心強", "直覺敏銳", "樂觀積極", "內斂平靜", "情感充沛", "隨遇而安", "謹慎防備", "渴望共鳴", "自我覺察", "坦率大方", "安穩踏實", "追求成長"],
-        value: ["事業優先", "重視家庭", "戶外冒險", "宅在家中", "極簡主義", "享樂生活", "藝術品味", "性別平權", "穩定安逸", "活在當下", "財務自由", "愛護動物", "儀式感", "自由不羈", "健康養生"],
-        food: ["日式", "義式", "美式", "韓式", "台式熱炒", "法式", "火鍋", "蔬食", "甜點", "小吃", "精釀啤酒", "深夜食堂", "異國香料", "海鮮", "咖啡"],
-        style: ["歐美", "日系文青", "韓系溫柔", "街頭", "復古", "正式", "甜美", "中性帥氣", "運動", "波西米亞", "黑色系", "慵懶", "繽紛", "極簡", "山系"]
-    };
-
-    // 3. 立刻產生標籤 HTML (確保畫面一出來就有選項)
-    function initTags() {
-        const containerBox = document.getElementById('tag-box-container');
-        if (!containerBox) return; // 保護機制
-        containerBox.innerHTML = ''; 
-
-        // 標籤對應的中文標題
-        const titles = {
-            social: '社交標籤',
-            emotion: '情緒標籤',
-            value: '價值觀',
-            food: '美食偏好',
-            style: '穿搭風格'
+    /* 🔥【關鍵修復】: 標籤產生程式碼移到最上面，保證一進來就看得到 */
+    (function initTags() {
+        const tagData = {
+            social: ["熱情主動", "慢熱內斂", "幽默風趣", "優質傾聽", "直言不諱", "溫柔體貼", "獨立自主", "深度對話", "隨和隨興", "好奇心強", "觀察敏銳", "給予空間", "有主見", "不拘小節", "優雅得體"],
+            emotion: ["感性細膩", "冷靜理智", "情緒穩定", "同理心強", "直覺敏銳", "樂觀積極", "內斂平靜", "情感充沛", "隨遇而安", "謹慎防備", "渴望共鳴", "自我覺察", "坦率大方", "安穩踏實", "追求成長"],
+            value: ["事業優先", "重視家庭", "戶外冒險", "宅在家中", "極簡主義", "享樂生活", "藝術品味", "性別平權", "穩定安逸", "活在當下", "財務自由", "愛護動物", "儀式感", "自由不羈", "健康養生"],
+            food: ["日式", "義式", "美式", "韓式", "台式熱炒", "法式", "火鍋", "蔬食", "甜點", "小吃", "精釀啤酒", "深夜食堂", "異國香料", "海鮮", "咖啡"],
+            style: ["歐美", "日系文青", "韓系溫柔", "街頭", "復古", "正式", "甜美", "中性帥氣", "運動", "波西米亞", "黑色系", "慵懶", "繽紛", "極簡", "山系"]
         };
 
-        Object.keys(tagData).forEach(key => {
-            // 建立區塊
-            const sectionDiv = document.createElement('div');
-            sectionDiv.className = 'tag-selection-area';
-            
-            // 建立標題
-            const h3 = document.createElement('div');
-            h3.className = 'tag-category-title';
-            h3.innerText = titles[key] || key;
-            sectionDiv.appendChild(h3);
-
-            // 建立選項容器
-            const flexDiv = document.createElement('div');
-            flexDiv.className = 'tag-container';
-            flexDiv.id = `${key}-tags`; // 給予 ID 方便抓取
-
-            // 是否限制選3個
-            const limitClass = (['social','emotion','value'].includes(key)) ? 'limit-3' : '';
-
-            // 產生按鈕
-            tagData[key].forEach((t, i) => {
-                const uniqueId = `${key}-${i}`;
+        const titles = { social: '社交', emotion: '情緒', value: '價值觀', food: '美食', style: '風格' };
+        const container = document.getElementById('tag-box-container');
+        
+        if (container) {
+            container.innerHTML = '';
+            Object.keys(tagData).forEach(key => {
+                let html = `<div class="tag-block"><div class="tag-category-header">${titles[key]}</div><div class="tag-container" id="${key}-tags">`;
+                const limitClass = (['social','emotion','value'].includes(key)) ? 'limit-3' : '';
                 
-                // checkbox
-                const input = document.createElement('input');
-                input.type = 'checkbox';
-                input.id = uniqueId;
-                input.value = t;
-                input.className = `tag-checkbox ${limitClass}`;
-
-                // label
-                const label = document.createElement('label');
-                label.htmlFor = uniqueId;
-                label.className = 'tag-label';
-                label.innerText = t;
-
-                flexDiv.appendChild(input);
-                flexDiv.appendChild(label);
+                tagData[key].forEach((t, i) => {
+                    const uid = `${key}-${i}`;
+                    html += `<input type="checkbox" id="${uid}" class="tag-checkbox ${limitClass}" value="${t}">
+                             <label for="${uid}" class="tag-label">${t}</label>`;
+                });
+                html += `</div></div>`;
+                container.innerHTML += html;
             });
+        }
+    })();
 
-            sectionDiv.appendChild(flexDiv);
-            containerBox.appendChild(sectionDiv);
-        });
-    }
-
-    // 🔥 立即執行產生標籤
-    initTags();
-
-    // 4. 監聽限制 (最多選3個)
+    // 監聽選取限制 (最多3個)
     document.body.addEventListener('change', (e) => {
         if (e.target.classList.contains('limit-3')) {
             const group = e.target.parentElement;
@@ -239,68 +190,75 @@
         }
     });
 
-    // ----------------------------------------------------
-    // 以下是功能邏輯
-    // ----------------------------------------------------
+    // ----------------------------------------------------------------
+    // 系統邏輯區 (這部分如果有錯，也不會影響上面標籤的顯示)
+    // ----------------------------------------------------------------
 
-    if(localStorage.getItem('yueLaoUser')) {
-        showVenue();
-    } else {
-        document.getElementById('loading-overlay').style.display = 'none';
-    }
+    // ⚠️ 請填入您的 Apps Script 網址
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDv4EOEmJ8dFwgZEv5mYtaiXuzbwgjMAUA",
+        authDomain: "jariah-match.firebaseapp.com",
+        projectId: "jariah-match",
+        appId: "1:863372390147:web:7541b1b478c33f3d824336"
+    };
+
+    // 安全載入 Firebase
+    try {
+        const script = document.createElement('script');
+        script.src = "https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js";
+        script.onload = () => {
+            try { firebase.initializeApp(firebaseConfig); } catch(e) {}
+            document.getElementById('loading-overlay').style.display = 'none';
+            if(localStorage.getItem('yueLaoUser')) showVenue();
+        };
+        document.head.appendChild(script);
+    } catch(e) { console.log("Firebase error", e); }
 
     function logout() { if(confirm('確定要切換身份嗎？')) { localStorage.removeItem('yueLaoUser'); location.reload(); } }
 
-    // 圖片壓縮
+    // 圖片轉文字
     function compressImage(file) {
         return new Promise((resolve) => {
             if (!file) { resolve(""); return; }
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = (event) => {
+            reader.onload = (e) => {
                 const img = new Image();
-                img.src = event.target.result;
+                img.src = e.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    const MAX_WIDTH = 300;
-                    const MAX_HEIGHT = 300;
-                    let width = img.width;
-                    let height = img.height;
-                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
-                    else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
-                    canvas.width = width;
-                    canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
+                    const MAX = 300; 
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > MAX) { h *= MAX/w; w = MAX; } } else { if (h > MAX) { w *= MAX/h; h = MAX; } }
+                    canvas.width = w; canvas.height = h;
+                    ctx.drawImage(img, 0, 0, w, h);
                     resolve(canvas.toDataURL('image/jpeg', 0.6));
                 };
             };
         });
     }
 
-    // 註冊功能
     async function register() {
         const name = document.getElementById('uName').value;
         if(!name) return alert('請填寫名字');
         
         const overlay = document.getElementById('loading-overlay');
         overlay.style.display = 'block';
-        overlay.innerText = "資料處理中...";
+        overlay.innerText = "資料儲存中...";
 
         try {
-            const p1Data = await compressImage(document.getElementById('file1').files[0]);
-            const p2Data = await compressImage(document.getElementById('file2').files[0]);
-            const p3Data = await compressImage(document.getElementById('file3').files[0]);
+            const p1 = await compressImage(document.getElementById('file1').files[0]);
+            const p2 = await compressImage(document.getElementById('file2').files[0]);
+            const p3 = await compressImage(document.getElementById('file3').files[0]);
 
-            // 收集標籤資料
-            const getTags = (id) => {
-                const els = document.querySelectorAll(`#${id}-tags input:checked`);
-                return Array.from(els).map(el => el.value).join(',');
-            };
+            const getTags = (id) => Array.from(document.querySelectorAll(`#${id}-tags input:checked`)).map(el => el.value).join(',');
 
             const payload = {
                 action: "register",
-                uName: name, p1: p1Data, p2: p2Data, p3: p3Data,
+                uName: name, p1: p1, p2: p2, p3: p3,
                 uBio: document.getElementById('uBio').value, uBirth: document.getElementById('uBirth').value, uHeight: document.getElementById('uHeight').value, uHoro: document.getElementById('uHoro').value, uMbti: document.getElementById('uMbti').value, 
                 uGender: document.getElementById('uGender').value, uSex: document.getElementById('uSex').value, uStatus: document.getElementById('uStatus').value,
                 uIceA: `[${document.getElementById('uIceQ').value}] ${document.getElementById('uIceA').value}`, 
@@ -351,7 +309,7 @@
             overlay.style.display = 'none'; 
             document.getElementById('setup-page').style.display = 'none';
             document.getElementById('venue-page').style.display = 'block';
-            alert("讀取資料失敗，請稍後重試。");
+            alert("目前沒有其他資料，或網路不穩。");
         }
     }
 
