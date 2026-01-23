@@ -2,43 +2,122 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>月霞酒吧 - 管理後台</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月霞酒吧 - 月老戰情室</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
-        .container { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1 { color: #E64A19; border-bottom: 2px solid #E64A19; padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        body { font-family: 'PingFang TC', sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        header { display: flex; align-items: center; border-bottom: 3px solid #E64A19; padding-bottom: 20px; margin-bottom: 20px; }
+        .logo { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #E64A19; margin-right: 20px; object-fit: cover; }
+        h1 { margin: 0; color: #E64A19; font-size: 24px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        th { background: #FFECB3; }
-        .highlight { background: #FFF9C4; font-weight: bold; color: #E64A19; }
+        th { background-color: #FFF3E0; color: #E64A19; font-weight: bold; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        
+        /* 狀態樣式 */
+        .status-match { background-color: #C8E6C9 !important; color: #2E7D32; font-weight: bold; } /* 成功配對 */
+        .status-wait { color: #999; } /* 等待中 */
+        .status-skip { color: #F44336; } /* 有一方略過 */
+        
+        .score-box { display: inline-block; width: 30px; height: 30px; line-height: 30px; border-radius: 50%; background: #eee; font-weight: bold; }
+        .score-high { background: #FFCC80; color: #E64A19; }
+        
+        .refresh-btn { float: right; padding: 10px 20px; background: #E64A19; color: white; border: none; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
+
 <div class="container">
-    <h1>📊 月霞酒吧：配對總覽</h1>
+    <button class="refresh-btn" onclick="location.reload()">🔄 刷新數據</button>
+    <header>
+        <img src="staff_old_man.jpg" alt="Logo" class="logo">
+        <div>
+            <h1>月霞酒吧配對後台</h1>
+            <p style="margin:5px 0 0 0; color:#888;">即時監控全場心意流向</p>
+        </div>
+    </header>
+
     <table>
         <thead>
-            <tr><th>測試員 A</th><th>測試員 B</th><th>A 給 B</th><th>B 給 A</th><th>積分總和</th><th>狀態</th></tr>
+            <tr>
+                <th>角色 A</th>
+                <th>角色 B</th>
+                <th>A 的心意</th>
+                <th>B 的心意</th>
+                <th>積分總和</th>
+                <th>配對狀態</th>
+            </tr>
         </thead>
-        <tbody id="admin-body"></tbody>
+        <tbody id="data-body">
+            <tr><td colspan="6">正在連線至資料庫...</td></tr>
+        </tbody>
     </table>
 </div>
+
 <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
-    async function load() {
-        const res = await fetch(API_URL);
-        const data = await res.json();
-        const body = document.getElementById('admin-body');
-        body.innerHTML = data.adminStats.map(s => `
-            <tr class="${s.total > 5 ? 'highlight' : ''}">
-                <td>${s.p1}</td><td>${s.p2}</td>
-                <td>${s.s12}</td><td>${s.s21}</td>
-                <td>${s.total}</td>
-                <td>${s.total > 5 ? '✅ 契合' : '尚未配對'}</td>
-            </tr>
-        `).join('');
+
+    async function fetchData() {
+        try {
+            const res = await fetch(API_URL);
+            const data = await res.json();
+            const body = document.getElementById('data-body');
+            body.innerHTML = '';
+
+            if (data.adminStats.length === 0) {
+                body.innerHTML = '<tr><td colspan="6">目前還沒有任何互動紀錄</td></tr>';
+                return;
+            }
+
+            data.adminStats.forEach(item => {
+                // 解析狀態
+                let statusHtml = '';
+                let rowClass = '';
+                
+                // 邏輯判斷
+                if (item.isMatch) {
+                    // 成功配對 (雙方給星且總分>5)
+                    statusHtml = '💖 配對成功';
+                    rowClass = 'status-match';
+                } else if (item.s12 === 0 || item.s21 === 0) {
+                    // 有一方給了 0 分 (略過)
+                    statusHtml = '<span class="status-skip">💔 緣分未到 (略過)</span>';
+                } else if (item.s12 === -1 || item.s21 === -1) {
+                    // 有一方還沒評分 (-1)
+                    statusHtml = '<span class="status-wait">⏳ 等待對方回應</span>';
+                } else {
+                    // 雙方都評了，但總分沒超過 5
+                    statusHtml = '<span class="status-wait">😐 感覺不夠強烈</span>';
+                }
+
+                // 分數顯示優化 (-1 顯示為 ?)
+                const showS12 = item.s12 === -1 ? '?' : item.s12;
+                const showS21 = item.s21 === -1 ? '?' : item.s21;
+                const showTotal = (item.s12 === -1 || item.s21 === -1) ? '-' : item.total;
+
+                body.innerHTML += `
+                    <tr class="${rowClass}">
+                        <td><strong>${item.p1}</strong></td>
+                        <td><strong>${item.p2}</strong></td>
+                        <td><span class="score-box ${item.s12>=4?'score-high':''}">${showS12}</span></td>
+                        <td><span class="score-box ${item.s21>=4?'score-high':''}">${showS21}</span></td>
+                        <td style="font-weight:bold; font-size:16px;">${showTotal}</td>
+                        <td>${statusHtml}</td>
+                    </tr>
+                `;
+            });
+
+        } catch (e) {
+            document.getElementById('data-body').innerHTML = '<tr><td colspan="6" style="color:red;">讀取失敗，請確認 Apps Script 已部署為新版本。</td></tr>';
+        }
     }
-    load();
+
+    fetchData();
+    setInterval(fetchData, 10000); // 每 10 秒自動刷新一次
 </script>
+
 </body>
 </html>
