@@ -10,15 +10,14 @@
     <style>
         body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #FFB74D; margin: 0; padding: 10px; color: #4E342E; }
         .container { max-width: 650px; margin: 10px auto; background-color: #FFF9F0; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; min-height: 80vh; }
-        
         .logout-btn { position: absolute; top: 20px; right: 20px; background: #8D6E63; color: white; border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; font-size: 13px; z-index: 10; }
         h1 { color: #E64A19; text-align: center; font-size: 32px; margin-bottom: 5px; }
         h2 { border-left: 5px solid #E64A19; padding-left: 10px; color: #5D4037; font-size: 20px; margin-top: 35px; background: #FFECB3; padding: 5px; border-radius: 5px; }
-
+        
         .input-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; }
         input, select, textarea { width: 100%; padding: 12px; border: 1.5px solid #FFCC80; border-radius: 12px; box-sizing: border-box; font-size: 16px; background: white; }
-        textarea { min-height: 120px; }
+        textarea { min-height: 100px; }
 
         .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .tag-checkbox { display: none; }
@@ -115,7 +114,7 @@
 </div>
 
 <script>
-    // 1. Firebase 設定 (已幫妳填入正確值)
+    // 1. Firebase Config (準確填入)
     const firebaseConfig = {
         apiKey: "AIzaSyDv4EOEmJ8dFwgZEv5mYtaiXuzbwgjMAUA",
         authDomain: "jariah-match.firebaseapp.com",
@@ -125,10 +124,10 @@
         appId: "1:863372390147:web:7541b1b478c33f3d824336",
         measurementId: "G-GDNBERRJJ1"
     };
-    firebase.initializeApp(firebaseConfig);
+    try { firebase.initializeApp(firebaseConfig); } catch(e) { console.error(e); }
     const storage = firebase.storage();
 
-    // 2. Apps Script 網址 (已幫妳填入正確值)
+    // 2. Apps Script 網址 (準確填入)
     const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
 
     const tagData = {
