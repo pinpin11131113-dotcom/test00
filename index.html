@@ -4,102 +4,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>月下老人 - 月霞酒吧</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
     <style>
         body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #FFB74D; margin: 0; padding: 10px; color: #4E342E; }
         .container { max-width: 650px; margin: 10px auto; background-color: #FFF9F0; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; }
-        h1 { color: #E64A19; text-align: center; font-size: 32px; }
-        .logout-btn { position: absolute; top: 20px; right: 20px; background: #8D6E63; color: white; border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; }
+        
+        .logout-btn { position: absolute; top: 20px; right: 20px; background: #8D6E63; color: white; border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; font-size: 13px; z-index: 10; }
+        h1 { color: #E64A19; text-align: center; font-size: 32px; margin-bottom: 5px; }
         h2 { border-left: 5px solid #E64A19; padding-left: 10px; color: #5D4037; font-size: 20px; margin-top: 35px; background: #FFECB3; padding: 5px; border-radius: 5px; }
         h3 { font-size: 16px; margin-top: 20px; color: #D84315; border-bottom: 1px dashed #FFCC80; padding-bottom: 5px; }
-        
+
         .input-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; }
         input, select, textarea { width: 100%; padding: 12px; border: 1.5px solid #FFCC80; border-radius: 12px; box-sizing: border-box; font-size: 16px; background: white; }
         textarea { min-height: 120px; }
-        
-        /* 修復標籤樣式：隱藏方塊，只顯示按鈕 */
+
+        /* 標籤 */
         .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .tag-checkbox { display: none; } /* 關鍵：把原始勾選框藏起來 */
-        .tag-label { 
-            display: inline-block; 
-            padding: 8px 16px; 
-            border: 1.5px solid #FFCC80; 
-            border-radius: 20px; 
-            background: #FFF; 
-            color: #5D4037;
-            cursor: pointer; 
-            font-size: 13px;
-            transition: 0.2s;
-        }
-        .tag-checkbox:checked + .tag-label { 
-            background: #FF8A80; 
-            color: white; 
-            border-color: #FF8A80; 
-            font-weight: bold;
-        }
-        .tag-checkbox:disabled + .tag-label {
-            opacity: 0.4;
-            cursor: not-allowed;
-            background: #EEE;
-        }
+        .tag-checkbox { display: none; }
+        .tag-label { display: inline-block; padding: 8px 16px; border: 1.5px solid #FFCC80; border-radius: 20px; background: #FFF; color: #5D4037; cursor: pointer; font-size: 13px; transition: 0.2s; }
+        .tag-checkbox:checked + .tag-label { background: #FF8A80; color: white; border-color: #FF8A80; font-weight: bold; }
+        .tag-checkbox:disabled + .tag-label { opacity: 0.4; cursor: not-allowed; background: #EEE; }
 
         .btn-main { width: 100%; padding: 18px; background: #E64A19; color: white; border: none; border-radius: 35px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        
+
         /* 卡片設計 */
-        .card { background: white; border-radius: 20px; padding: 20px; margin-top: 15px; border: 1px solid #FFCC80; text-align: left; }
+        .card { background: white; border-radius: 20px; padding: 25px; margin-top: 20px; border: 1px solid #FFCC80; text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FFF3E0; padding-bottom: 10px; margin-bottom: 15px; }
+        .card-name { font-size: 22px; font-weight: bold; color: #E64A19; margin: 0; }
+        .card-mbti { background: #FFECB3; color: #E64A19; padding: 4px 10px; border-radius: 10px; font-size: 14px; font-weight: bold; }
+
+        /* 真實照片展示區 */
+        .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .photo-item { aspect-ratio: 1/1; border-radius: 10px; border: 2px solid #FFCC80; object-fit: cover; width: 100%; background: #F5F5F5; }
+
+        .card-bio { font-size: 15px; color: #5D4037; line-height: 1.6; background: #FFF9F0; padding: 15px; border-radius: 15px; margin-bottom: 15px; white-space: pre-wrap; }
+        .card-detail { font-size: 14px; color: #666; margin-bottom: 5px; border-bottom: 1px dashed #EEE; padding-bottom: 5px; }
+        .card-detail strong { color: #E64A19; }
+
         .action-area { margin-top: 15px; display: flex; align-items: center; justify-content: space-between; }
-        .star-box { font-size: 24px; }
-        .star-btn { cursor: pointer; color: #DDD; padding: 0 2px; }
-        .star-btn.active { color: gold; }
-        .skip-btn { background: #B0BEC5; color: white; border: none; padding: 6px 14px; border-radius: 15px; cursor: pointer; font-size: 12px; }
-        .rated-text { color: #8D6E63; font-weight: bold; display: none; background: #EEE; padding: 5px 10px; border-radius: 10px; font-size: 12px; text-align: center; margin-top: 10px; }
+        .star-box { font-size: 28px; }
+        .star-btn { cursor: pointer; color: #E0E0E0; padding: 0 4px; transition: 0.2s; }
+        .star-btn.active { color: #FFC107; }
+        .skip-btn { background: #CFD8DC; color: #546E7A; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold; }
+        .rated-badge { display: none; background: #EEE; color: #9E9E9E; padding: 10px; text-align: center; border-radius: 10px; font-weight: bold; }
 
         #fallback-box { text-align: center; display: none; margin-top: 20px; padding: 20px; background: #FFF3E0; border-radius: 20px; }
-        #fallback-box img { width: 200px; border-radius: 50%; border: 4px solid #E64A19; margin-bottom: 15px; }
-        #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white; text-align: center; padding-top: 200px; z-index: 1000; font-weight: bold; }
+        #fallback-box img { width: 180px; border-radius: 50%; border: 4px solid #E64A19; margin-bottom: 15px; }
+
+        #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: white; text-align: center; padding-top: 200px; z-index: 1000; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="loading-overlay">資料傳輸中...</div>
+<div id="loading-overlay">正在上傳照片並建立連結...</div>
 
 <div class="container">
-    <button class="logout-btn" onclick="logout()">切換身份</button>
+    <button class="logout-btn" onclick="logout()">切換身份/註冊</button>
     <h1>月下老人</h1>
+    <p style="text-align: center; color: #8D6E63; font-size: 14px; margin-bottom: 20px;">月霞酒吧專屬配對系統</p>
 
     <div id="setup-page">
-        <h2>1. 靈魂內心獨白 (置頂)</h2>
+        <h2>1. 靈魂自我介紹 (置頂)</h2>
         <div class="input-group">
             <label>自我介紹</label>
-            <textarea id="uBio" placeholder="寫下關於妳的故事、靈魂，或是對這座酒吧的期待..."></textarea>
+            <textarea id="uBio" placeholder="寫下關於妳的故事... (這段文字會顯示在卡片最顯眼的地方)"></textarea>
         </div>
         <div class="input-group">
-            <label>生活照 (選三張)</label>
-            <input type="file" style="margin-bottom:5px;"><br><input type="file" style="margin-bottom:5px;"><br><input type="file">
-            <p style="font-size: 11px; color: #8D6E63; margin-top:5px;">💡 展現最真實的妳，讓命中注定的那個她能在月霞酒吧一眼認出妳喔。</p>
+            <label>生活照 (請選擇 3 張真實照片)</label>
+            <input type="file" id="file1" accept="image/*" style="margin-bottom:5px;">
+            <input type="file" id="file2" accept="image/*" style="margin-bottom:5px;">
+            <input type="file" id="file3" accept="image/*">
+            <p style="font-size: 12px; color: #8D6E63; margin-top:5px;">💡 照片將會上傳至雲端並顯示在妳的卡片上。</p>
         </div>
 
         <div class="input-group"><label>妳的名字 / 暱稱</label><input type="text" id="uName"></div>
         
         <div class="input-group">
-            <label>身高 / 星座 / MBTI</label>
-            <div style="display:flex; gap:10px;">
-                <input type="number" id="uHeight" placeholder="cm">
+            <label>基本資料</label>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="date" id="uBirth" style="flex:1;">
+                <input type="number" id="uHeight" placeholder="身高(cm)" style="flex:1;">
+            </div>
+            <div style="display:flex; gap:10px; margin-top:10px;">
                 <select id="uHoro"><option>牡羊座</option><option>金牛座</option><option>雙子座</option><option>巨蟹座</option><option>獅子座</option><option>處女座</option><option>天秤座</option><option>天蠍座</option><option>射手座</option><option>摩羯座</option><option>水瓶座</option><option>雙魚座</option></select>
                 <select id="uMbti">
-                    <option value="">請選擇</option>
-                    <optgroup label="分析家">
-                        <option>INTJ 建築師</option><option>INTP 邏輯學家</option><option>ENTJ 指揮官</option><option>ENTP 辯論家</option>
-                    </optgroup>
-                    <optgroup label="外交官">
-                        <option>INFJ 提倡者</option><option>INFP 調解者</option><option>ENFJ 主人公</option><option>ENFP 競選者</option>
-                    </optgroup>
-                    <optgroup label="守護者">
-                        <option>ISTJ 物流師</option><option>ISFJ 守衛者</option><option>ESTJ 總管</option><option>ESFJ 執政官</option>
-                    </optgroup>
-                    <optgroup label="探險家">
-                        <option>ISTP 鑒賞家</option><option>ISFP 探險家</option><option>ESTP 企業家</option><option>ESFP 表演者</option>
-                    </optgroup>
+                    <option value="">MBTI</option>
+                    <optgroup label="分析家"><option>INTJ 建築師</option><option>INTP 邏輯學家</option><option>ENTJ 指揮官</option><option>ENTP 辯論家</option></optgroup>
+                    <optgroup label="外交官"><option>INFJ 提倡者</option><option>INFP 調解者</option><option>ENFJ 主人公</option><option>ENFP 競選者</option></optgroup>
+                    <optgroup label="守護者"><option>ISTJ 物流師</option><option>ISFJ 守衛者</option><option>ESTJ 總管</option><option>ESFJ 執政官</option></optgroup>
+                    <optgroup label="探險家"><option>ISTP 鑒賞家</option><option>ISFP 探險家</option><option>ESTP 企業家</option><option>ESFP 表演者</option></optgroup>
                 </select>
             </div>
         </div>
@@ -107,14 +103,21 @@
         <div class="input-group"><label>性取向</label><select id="uSex"><option>女同志</option><option>雙性戀</option><option>異性戀</option><option>泛性戀</option><option>無性戀</option></select></div>
         <div class="input-group"><label>感情狀態</label><select id="uStatus"><option>單身</option><option>開放式關係</option><option>曖昧中</option><option>尋找穩定關係</option></select></div>
 
-        <h2>2. 妳的專屬標籤 (各區限選3個)</h2>
+        <h2>2. 個性與期待</h2>
+        <div class="input-group"><label>破冰回答</label><input type="text" id="uIceA" placeholder="如果不考慮錢，最想去哪？"></div>
+        <div class="input-group"><label>關於寵物</label><input type="text" id="uPet" placeholder="貓派/狗派/其他..."></div>
+        <div class="input-group"><label>約會期待</label><select id="uDate"><option>安靜喝咖啡</option><option>去看展覽</option><option>酒精路跑</option><option>看夜景</option><option>漫步公園</option><option>遊樂園冒險</option><option>手作工作坊</option><option>電影馬拉松</option><option>精緻法餐</option><option>密室逃脫</option></select></div>
+
+        <h2>3. 興趣 (已獨立分開)</h2>
+        <div class="input-group"><label>喜歡的電影</label><input type="text" id="uMovie" placeholder="例如：王家衛、恐怖片..."></div>
+        <div class="input-group"><label>喜歡的音樂</label><input type="text" id="uMusic" placeholder="例如：獨立樂團、K-POP..."></div>
+        <div class="input-group"><label>喜歡的運動</label><input type="text" id="uSport" placeholder="例如：爬山、潛水、瑜伽..."></div>
+        <div class="input-group"><label>其他興趣細節</label><textarea id="uHobby" placeholder="還有什麼其他熱愛的？"></textarea></div>
+
+        <h2>4. 妳的專屬標籤 (各區限選3個)</h2>
         <div id="tag-box"></div>
 
-        <h2>3. 興趣與期待</h2>
-        <div class="input-group"><label>理想第一次約會</label><select id="uDate"><option>安靜喝咖啡</option><option>去看展覽</option><option>酒精路跑</option><option>看夜景</option><option>漫步公園</option><option>遊樂園冒險</option><option>手作工作坊</option><option>電影馬拉松</option><option>精緻法餐</option><option>密室逃脫</option></select></div>
-        <div class="input-group"><label>手寫興趣</label><textarea id="uHobby" style="min-height:80px;" placeholder="電影、音樂、運動..."></textarea></div>
-
-        <button class="btn-main" onclick="register()">進入會場</button>
+        <button class="btn-main" onclick="register()">儲存並進入會場</button>
     </div>
 
     <div id="venue-page" style="display:none;">
@@ -128,9 +131,23 @@
 </div>
 
 <script>
+    // --- ⚠️ 妳的 Firebase Config (已填入) ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyDv4EOEmJ8dFwgZEv5mYtaiXuzbwgjMAUA",
+        authDomain: "jariah-match.firebaseapp.com",
+        projectId: "jariah-match",
+        storageBucket: "jariah-match.firebasestorage.app",
+        messagingSenderId: "863372390147",
+        appId: "1:863372390147:web:7541b1b478c33f3d824336",
+        measurementId: "G-GDNBERRJJ1"
+    };
+    
+    // 初始化 Firebase
+    firebase.initializeApp(firebaseConfig);
+    const storage = firebase.storage();
+
     const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
 
-    // 完整的 75 個標籤資料 (不縮減)
     const tagData = {
         social: ["熱情主動", "慢熱內斂", "幽默風趣", "優質傾聽", "直言不諱", "溫柔體貼", "獨立自主", "深度對話", "隨和隨興", "好奇心強", "觀察敏銳", "給予空間", "有主見", "不拘小節", "優雅得體"],
         emotion: ["感性細膩", "冷靜理智", "情緒穩定", "同理心強", "直覺敏銳", "樂觀積極", "內斂平靜", "情感充沛", "隨遇而安", "謹慎防備", "渴望共鳴", "自我覺察", "坦率大方", "安穩踏實", "追求成長"],
@@ -139,30 +156,17 @@
         style: ["歐美", "日系文青", "韓系溫柔", "街頭", "復古", "正式", "甜美", "中性帥氣", "運動", "波西米亞", "黑色系", "慵懶", "繽紛", "極簡", "山系"]
     };
 
-    // 渲染標籤
     const tBox = document.getElementById('tag-box');
     Object.keys(tagData).forEach(key => {
-        let title = '';
-        if(key === 'social') title = '社交風格';
-        else if(key === 'emotion') title = '情緒感受';
-        else if(key === 'value') title = '生活價值觀';
-        else if(key === 'food') title = '美食喜好';
-        else if(key === 'style') title = '穿搭風格';
-
+        let title = key==='social'?'社交風格':key==='emotion'?'情緒感受':key==='value'?'價值觀':key==='food'?'美食':key==='style'?'穿搭':'';
         tBox.innerHTML += `<h3>${title}</h3><div class="tag-container" id="${key}-tags"></div>`;
         const container = document.getElementById(`${key}-tags`);
-        const limitClass = (['social','emotion','value'].includes(key)) ? 'limit-3' : ''; // 前三區有限制
-        
+        const limitClass = (['social','emotion','value'].includes(key)) ? 'limit-3' : '';
         tagData[key].forEach((t, i) => {
-            // 使用正確的 ID 綁定，確保樣式正確
-            container.innerHTML += `
-                <input type="checkbox" id="${key}-${i}" class="tag-checkbox ${limitClass}" value="${t}">
-                <label for="${key}-${i}" class="tag-label">${t}</label>
-            `;
+            container.innerHTML += `<input type="checkbox" id="${key}-${i}" class="tag-checkbox ${limitClass}" value="${t}"><label for="${key}-${i}" class="tag-label">${t}</label>`;
         });
     });
 
-    // 標籤限制邏輯 (3個)
     document.body.addEventListener('change', (e) => {
         if (e.target.classList.contains('limit-3')) {
             const group = e.target.parentElement;
@@ -172,27 +176,57 @@
     });
 
     if(localStorage.getItem('yueLaoUser')) showVenue();
-    function logout() { localStorage.removeItem('yueLaoUser'); location.reload(); }
+    
+    function logout() { 
+        if(confirm('確定要切換身份嗎？')) {
+            localStorage.removeItem('yueLaoUser'); 
+            location.reload(); 
+        }
+    }
+
+    // 上傳圖片到 Firebase 並回傳 URL
+    async function uploadImage(file) {
+        if (!file) return "";
+        const ref = storage.ref('users/' + new Date().getTime() + '_' + file.name);
+        await ref.put(file);
+        return await ref.getDownloadURL();
+    }
 
     async function register() {
         const name = document.getElementById('uName').value;
         if(!name) return alert('請填寫名字');
-        document.getElementById('loading-overlay').style.display = 'block';
         
+        document.getElementById('loading-overlay').style.display = 'block';
+
+        // 1. 先上傳照片到 Firebase
+        const p1Url = await uploadImage(document.getElementById('file1').files[0]);
+        const p2Url = await uploadImage(document.getElementById('file2').files[0]);
+        const p3Url = await uploadImage(document.getElementById('file3').files[0]);
+
+        // 2. 準備打包資料 (含獨立的興趣欄位)
         const payload = {
             action: "register",
             uName: name, 
+            p1: p1Url, // 傳送真實網址
+            p2: p2Url,
+            p3: p3Url,
             uBio: document.getElementById('uBio').value, 
-            uBirth: '', // 網頁沒放生日，傳空值
+            uBirth: document.getElementById('uBirth').value, 
             uHeight: document.getElementById('uHeight').value, 
             uHoro: document.getElementById('uHoro').value,
             uMbti: document.getElementById('uMbti').value, 
             uGender: document.getElementById('uGender').value,
             uSex: document.getElementById('uSex').value, 
             uStatus: document.getElementById('uStatus').value,
-            uDate: document.getElementById('uDate').value, 
+            uIceA: document.getElementById('uIceA').value,
+            uPet: document.getElementById('uPet').value,
+            uDate: document.getElementById('uDate').value,
+            // 獨立分開的興趣
+            uMovie: document.getElementById('uMovie').value,
+            uMusic: document.getElementById('uMusic').value,
+            uSport: document.getElementById('uSport').value,
             uHobby: document.getElementById('uHobby').value,
-            // 抓取完整標籤
+            // 標籤
             tagSocial: Array.from(document.querySelectorAll('#social-tags input:checked')).map(el => el.value).join(','),
             tagEmotion: Array.from(document.querySelectorAll('#emotion-tags input:checked')).map(el => el.value).join(','),
             tagValue: Array.from(document.querySelectorAll('#value-tags input:checked')).map(el => el.value).join(','),
@@ -200,9 +234,10 @@
             tagStyle: Array.from(document.querySelectorAll('#style-tags input:checked')).map(el => el.value).join(',')
         };
         
+        // 3. 傳送到 Google 試算表
         await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
         localStorage.setItem('yueLaoUser', name);
-        setTimeout(showVenue, 1500);
+        setTimeout(showVenue, 2000); // 等待時間稍長一點，確保照片上傳完成
     }
 
     async function showVenue() {
@@ -217,41 +252,67 @@
         const cardBox = document.getElementById('user-cards');
         const fallback = document.getElementById('fallback-box');
 
-        // 嚴格配對：雙向給分 > 0 且 總分 > 5
         const myMatches = data.adminStats.filter(s => (s.p1 === me || s.p2 === me) && s.isMatch);
 
         cardBox.innerHTML = '';
         if(myMatches.length > 0) {
             fallback.style.display = 'none';
-            cardBox.innerHTML += `<div style="background:#FFF3E0;padding:15px;border-radius:15px;margin-bottom:20px;border:2px dashed #E64A19;">
-                <h3 style="margin:0;color:#E64A19;">💖 配對成功名單</h3>
-                ${myMatches.map(m => {
-                    const p = (m.p1 === me) ? m.p2 : m.p1;
-                    return `<div>與 <strong>${p}</strong> 默契總分 ${m.total}！</div>`;
-                }).join('')}
-            </div>`;
+            cardBox.innerHTML += `
+                <div style="background:#FFF3E0;padding:20px;border-radius:20px;margin-bottom:20px;border:3px dashed #E64A19;text-align:center;">
+                    <h3 style="margin:0;color:#E64A19;font-size:20px;">💖 配對成功！</h3>
+                    ${myMatches.map(m => {
+                        const p = (m.p1 === me) ? m.p2 : m.p1;
+                        return `<div style="font-size:18px;font-weight:bold;margin-top:5px;">✨ ${p} (默契 ${m.total} 分)</div>`;
+                    }).join('')}
+                </div>`;
         } else {
             fallback.style.display = 'block';
         }
 
         const ratedList = data.ratedHistory || {};
-        
-        data.users.forEach(u => {
-            if(u.name === me) return;
-            const hasRated = ratedList[me + "_" + u.name];
+        const otherUsers = data.users.filter(u => u.name !== me);
 
+        if (otherUsers.length > 0) fallback.style.display = 'none';
+
+        otherUsers.forEach(u => {
+            const hasRated = ratedList[me + "_" + u.name];
+            
+            // 處理照片顯示
+            const img1 = u.p1 ? `<img src="${u.p1}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;">無照片</div>';
+            const img2 = u.p2 ? `<img src="${u.p2}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;">無照片</div>';
+            const img3 = u.p3 ? `<img src="${u.p3}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;">無照片</div>';
+
+            // 顯示所有興趣欄位
             cardBox.innerHTML += `
                 <div class="card">
-                    <p style="color:#8D6E63;font-style:italic;">「${u.bio}」</p>
-                    <h3 style="margin:5px 0;color:#E64A19;">${u.name} (${u.horo})</h3>
-                    <p>MBTI: ${u.mbti}</p>
+                    <div class="card-header">
+                        <span class="card-name">${u.name} - ${u.horo}</span>
+                        <span class="card-mbti">${u.mbti}</span>
+                    </div>
+
+                    <div class="photo-grid">
+                        ${img1}${img2}${img3}
+                    </div>
+
+                    <div class="card-bio">${u.bio || "（這位朋友還沒寫自我介紹...）"}</div>
+
+                    <div class="card-detail"><strong>基本：</strong>${u.birth || ''} / ${u.height || ''}cm / ${u.status || ''}</div>
+                    <div class="card-detail"><strong>破冰：</strong>${u.ice || ''}</div>
+                    <div class="card-detail"><strong>寵物：</strong>${u.pet || ''}</div>
+                    <div class="card-detail"><strong>期待：</strong>${u.date || ''}</div>
+                    <div class="card-detail"><strong>電影：</strong>${u.movie || '無'}</div>
+                    <div class="card-detail"><strong>音樂：</strong>${u.music || '無'}</div>
+                    <div class="card-detail"><strong>運動：</strong>${u.sport || '無'}</div>
+                    <div class="card-detail"><strong>其他：</strong>${u.hobby || '無'}</div>
+
                     <div class="action-area" id="action-${u.name}" style="display:${hasRated ? 'none' : 'flex'}">
                         <div class="star-box">
                             ${[1,2,3,4,5].map(i => `<span class="star-btn" onclick="rate('${u.name}', ${i})">★</span>`).join('')}
                         </div>
                         <button class="skip-btn" onclick="rate('${u.name}', 0)">略過</button>
                     </div>
-                    <div class="rated-text" style="display:${hasRated ? 'block' : 'none'}">
+
+                    <div class="rated-badge" style="display:${hasRated ? 'block' : 'none'}">
                         ✅ 已送出心意
                     </div>
                 </div>`;
@@ -261,12 +322,9 @@
     async function rate(toUser, score) {
         const fromUser = localStorage.getItem('yueLaoUser');
         document.getElementById(`action-${toUser}`).style.display = 'none';
-        // 為了讓使用者立刻有感，可以先顯示「已送出」
         const card = document.getElementById(`action-${toUser}`).parentElement;
-        card.querySelector('.rated-text').style.display = 'block';
-
+        card.querySelector('.rated-badge').style.display = 'block';
         await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "rate", fromUser, toUser, stars: score }) });
-        // 不強制刷新整個畫面，只送出請求
     }
 </script>
 </body>
