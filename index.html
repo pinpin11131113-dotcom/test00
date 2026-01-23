@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>月下老人 - 聯誼配對系統</title>
     <style>
-        /* 核心視覺：橘黃色背景 */
+        /* --- 1. 核心視覺：橘黃色主題 --- */
         body {
             font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-            background-color: #FFB74D; 
+            background-color: #FFB74D; /* 妳指定的橘黃色背景 */
             margin: 0; padding: 10px; color: #4E342E;
         }
         .container {
@@ -17,30 +17,41 @@
         }
         h1 { color: #E64A19; text-align: center; font-size: 32px; margin-bottom: 5px; }
         .subtitle { text-align: center; color: #8D6E63; margin-bottom: 25px; font-size: 14px; }
+        
         h2 { border-left: 5px solid #E64A19; padding-left: 10px; color: #5D4037; font-size: 20px; margin-top: 35px; background: #FFECB3; padding: 5px 10px; border-radius: 5px; }
         h3 { font-size: 17px; margin-top: 25px; color: #D84315; border-bottom: 1px solid #FFCC80; padding-bottom: 5px; }
+
+        .section { margin-bottom: 35px; }
         .input-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 15px; color: #5D4037; }
+
         input[type="text"], input[type="number"], input[type="date"], select, textarea {
-            width: 100%; padding: 12px; border: 1.5px solid #FFCC80; border-radius: 12px; font-size: 16px; box-sizing: border-box;
+            width: 100%; padding: 12px; border: 1.5px solid #FFCC80; border-radius: 12px;
+            font-size: 16px; background-color: white; box-sizing: border-box;
         }
+        textarea { resize: vertical; min-height: 100px; }
+
         /* MBTI 測試按鈕樣式 */
         .btn-test {
             display: inline-block; margin-top: 8px; padding: 8px 16px; background-color: #FB8C00;
             color: white; text-decoration: none; border-radius: 20px; font-size: 13px; font-weight: bold;
         }
-        /* 標籤設計 */
+
+        /* 標籤設計 (Chips) */
         .tag-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
         .tag-checkbox { display: none; }
         .tag-label {
-            display: inline-block; padding: 7px 14px; border: 1.5px solid #FFCC80; border-radius: 20px;
-            background-color: #FFF; color: #5D4037; cursor: pointer; font-size: 13px;
+            display: inline-block; padding: 7px 14px; border: 1.5px solid #FFCC80;
+            border-radius: 20px; background-color: #FFF; color: #5D4037;
+            cursor: pointer; font-size: 13px; transition: 0.2s;
         }
         .tag-checkbox:checked + .tag-label { background-color: #FF8A80; color: white; border-color: #FF8A80; }
         .tag-checkbox:disabled + .tag-label { opacity: 0.3; cursor: not-allowed; }
+
         .btn-main {
             width: 100%; padding: 18px; background-color: #E64A19; color: white; border: none;
-            border-radius: 35px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 30px;
+            border-radius: 35px; font-size: 18px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(230, 74, 25, 0.3); margin-top: 30px;
         }
     </style>
 </head>
@@ -48,68 +59,78 @@
 
 <div class="container">
     <h1>月下老人</h1>
-    <div class="subtitle">遇見命中注定的那個她</div>
+    <div class="subtitle">遇見命中注定的那個妳</div>
 
     <div id="setup-page">
         <div class="section">
             <h2>1. 基本硬性資料</h2>
+            
             <div class="input-group">
                 <label>生活照 (最多三張)</label>
-                <input type="file" accept="image/*" style="margin-bottom:8px;"><br>
-                <input type="file" accept="image/*" style="margin-bottom:8px;"><br>
-                <input type="file" accept="image/*">
+                <input type="file" class="persist" id="img1" accept="image/*" style="margin-bottom:8px;">
+                <input type="file" class="persist" id="img2" accept="image/*" style="margin-bottom:8px;">
+                <input type="file" class="persist" id="img3" accept="image/*">
                 <p style="font-size: 12px; color: #8D6E63; margin-top: 5px;">💡 展現最真實的妳，讓命中注定的對象能一眼認出妳喔。</p>
             </div>
+
             <div class="input-group">
                 <label>妳的名字 / 暱稱</label>
-                <input type="text" id="userName" placeholder="如何稱呼妳？">
+                <input type="text" id="userName" class="persist" placeholder="如何稱呼妳？">
             </div>
+
             <div class="input-group">
                 <label>自我介紹 (開放式填寫)</label>
-                <textarea placeholder="寫下妳的故事、興趣，或是對另一半的期待..."></textarea>
+                <textarea id="userBio" class="persist" placeholder="寫下妳的故事、興趣，或是對另一半的期待..."></textarea>
             </div>
+
             <div class="input-group">
                 <label>出生年月日 (含年份)</label>
-                <input type="date" id="birthDate">
+                <input type="date" id="birthDate" class="persist">
             </div>
+
             <div class="input-group">
                 <label>身高 (cm)</label>
-                <input type="number" id="heightInput" min="100" max="220" placeholder="100 - 220">
+                <input type="number" id="heightInput" class="persist" min="100" max="220" placeholder="100 - 220">
             </div>
+
             <div class="input-group">
                 <label>星座</label>
-                <select id="horoscopeSelect">
+                <select id="horoscopeSelect" class="persist">
                     <option value="" disabled selected>請選擇</option>
                     <option>牡羊座</option><option>金牛座</option><option>雙子座</option><option>巨蟹座</option>
                     <option>獅子座</option><option>處女座</option><option>天秤座</option><option>天蠍座</option>
                     <option>射手座</option><option>摩羯座</option><option>水瓶座</option><option>雙魚座</option>
                 </select>
             </div>
+
             <div class="input-group">
                 <label>性別認同 (單選)</label>
-                <select>
+                <select id="genderIdentity" class="persist">
                     <option value="" disabled selected>請選擇</option>
                     <option>女性</option><option>跨女</option><option>非二元/性別流動</option><option>探索中</option>
                 </select>
             </div>
+
             <div class="input-group">
                 <label>性取向 (單選)</label>
-                <select>
+                <select id="sexualOrientation" class="persist">
                     <option value="" disabled selected>請選擇</option>
                     <option>女同志</option><option>雙性戀</option><option>異性戀</option><option>泛性戀</option><option>無性戀</option>
                 </select>
             </div>
+
             <div class="input-group">
                 <label>感情狀態 (單選)</label>
-                <select>
+                <select id="relStatus" class="persist">
                     <option value="" disabled selected>請選擇</option>
                     <option>單身</option><option>開放式關係</option><option>曖昧中</option><option>尋找穩定關係</option>
                 </select>
             </div>
+
             <div class="input-group">
                 <label>MBTI 人格類型</label>
                 <a href="https://www.16personalities.com/tw/%E4%BA%BA%E6%A0%BC%E6%B8%AC%E8%A9%A6" target="_blank" class="btn-test">點我測試 MBTI</a>
-                <select style="margin-top: 10px;">
+                <select id="mbtiSelect" class="persist" style="margin-top: 10px;">
                     <option>我不知道自己的 MBTI</option>
                     <optgroup label="分析家">
                         <option>INTJ 建築師</option><option>INTP 邏輯學家</option><option>ENTJ 指揮官</option><option>ENTP 辯論家</option>
@@ -128,21 +149,29 @@
         </div>
 
         <div class="section">
-            <h2>2. 生活感與約會期待</h2>
+            <h2>2. 生活感與期待</h2>
             <div class="input-group">
                 <label>破冰問句 (三選一填寫)</label>
-                <select><option>如果不考慮錢，我最想去的地方是...</option><option>我的理想週末通常是這樣過的...</option><option>如果明天是世界末日，我最後一餐要吃...</option></select>
-                <textarea style="margin-top:10px;" placeholder="在此填寫回答..."></textarea>
+                <select id="icebreakerQ" class="persist">
+                    <option>如果不考慮錢，我最想去的地方是...</option>
+                    <option>我的理想週末通常是這樣過的...</option>
+                    <option>如果明天是世界末日，我最後一餐要吃...</option>
+                </select>
+                <textarea id="icebreakerA" class="persist" style="margin-top: 10px;" placeholder="在此填寫回答..."></textarea>
             </div>
+            
             <div class="input-group">
                 <label>關於寵物</label>
-                <select><option>貓派</option><option>狗派</option><option>都有</option><option>都沒有但喜歡</option><option>過敏中</option></select>
+                <select id="petPref" class="persist">
+                    <option>貓派</option><option>狗派</option><option>都有</option><option>都沒有但喜歡</option><option>過敏中</option>
+                </select>
             </div>
+
             <div class="input-group">
                 <label>理想的第一次約會 (10個選項)</label>
-                <select>
+                <select id="datePref" class="persist">
                     <option>安靜喝咖啡</option><option>去看展覽</option><option>酒精路跑</option><option>看夜景</option>
-                    <option>戶外野餐</option><option>遊樂園尖叫</option><option>手作陶藝</option><option>電影馬拉松</option>
+                    <option>戶外野餐</option><option>遊樂園冒險</option><option>手作工作坊</option><option>電影馬拉松</option>
                     <option>精緻法餐</option><option>密室逃脫</option>
                 </select>
             </div>
@@ -156,31 +185,38 @@
         </div>
 
         <div class="section">
-            <h2>4. 生活興趣 (手填)</h2>
-            <div class="input-group"><label>電影 (1-2部)</label><input type="text"></div>
-            <div class="input-group"><label>音樂 (1-2首/專輯)</label><input type="text"></div>
-            <div class="input-group"><label>運動類別</label><input type="text"></div>
-            <div class="input-group"><label>興趣類別</label><input type="text"></div>
-            <div class="input-group"><label>室內活動</label><input type="text"></div>
-            <div class="input-group"><label>戶外活動</label><input type="text"></div>
+            <h2>4. 興趣愛好 (手寫)</h2>
+            <div class="input-group"><label>電影</label><input type="text" id="favMovie" class="persist"></div>
+            <div class="input-group"><label>音樂</label><input type="text" id="favMusic" class="persist"></div>
+            <div class="input-group"><label>運動</label><input type="text" id="favSport" class="persist"></div>
+            <div class="input-group"><label>興趣</label><input type="text" id="favHobby" class="persist"></div>
+            <div class="input-group"><label>室內活動</label><input type="text" id="favIndoor" class="persist"></div>
+            <div class="input-group"><label>戶外活動</label><input type="text" id="favOutdoor" class="persist"></div>
         </div>
 
         <div class="section">
-            <h2>5. 美感喜好 (多選)</h2>
+            <h2>5. 美感與喜好 (多選)</h2>
             <h3>美食喜好 (15項)</h3><div class="tag-container" id="food-tags"></div>
             <h3>穿衣風格 (15項)</h3><div class="tag-container" id="style-tags"></div>
         </div>
-        <button class="btn-main" onclick="goToVenue()">進入會場</button>
+
+        <button class="btn-main" onclick="goToVenue()">儲存並進入會場</button>
     </div>
 
     <div id="venue-page" style="display: none; text-align: center; padding: 50px;">
         <h2>正在匹配緣分...</h2>
-        <button class="btn-main" onclick="location.reload()">重新修改</button>
+        <div style="background: white; padding: 20px; border-radius: 15px; margin: 20px 0; border: 2px dashed #FFCC80;">
+            <p>🌟 您填寫的資料已儲存到瀏覽器</p>
+            <p style="font-size: 14px; color: #8D6E63;">(測試人員可點擊下方按鈕模擬切換視角)</p>
+        </div>
+        <button class="btn-main" onclick="clearData()" style="background-color: #8D6E63;">登出 / 清除所有資料</button>
+        <button class="btn-main" onclick="goToSetup()">回到個人資料</button>
     </div>
 </div>
 
 <script>
-    const tags = {
+    // 數據定義
+    const lists = {
         social: ["熱情主動", "慢熱內斂", "幽默風趣", "優質傾聽", "直言不諱", "溫柔體貼", "獨立自主", "深度對話", "隨和隨興", "好奇心強", "觀察敏銳", "給予空間", "有主見", "不拘小節", "優雅得體"],
         emotion: ["感性細膩", "冷靜理智", "情緒穩定", "同理心強", "直覺敏銳", "樂觀積極", "內斂平靜", "情感充沛", "隨遇而安", "謹慎防備", "渴望共鳴", "自我覺察", "坦率大方", "安穩踏實", "追求成長"],
         value: ["事業優先", "重視家庭", "戶外冒險", "宅在家中", "極簡主義", "享樂生活", "藝術品味", "性別平權", "穩定安逸", "活在當下", "財務自由", "愛護動物", "儀式感", "自由不羈", "健康養生"],
@@ -188,20 +224,22 @@
         style: ["歐美", "日系文青", "韓系溫柔", "街頭", "復古", "正式", "甜美", "中性帥氣", "運動", "波西米亞", "黑色系", "慵懶", "繽紛", "極簡", "山系"]
     };
 
-    function render(id, list, limit) {
+    // 渲染標籤
+    function render(id, list, limitClass) {
         const container = document.getElementById(id);
         list.forEach((item, i) => {
             const tagId = `${id}-${i}`;
-            container.innerHTML += `<input type="checkbox" id="${tagId}" class="tag-checkbox ${limit}"><label for="${tagId}" class="tag-label">${item}</label>`;
+            container.innerHTML += `<input type="checkbox" id="${tagId}" class="tag-checkbox ${limitClass} persist-cb"><label for="${tagId}" class="tag-label">${item}</label>`;
         });
     }
 
-    render('social-tags', tags.social, 'limit-3');
-    render('emotion-tags', tags.emotion, 'limit-3');
-    render('value-tags', tags.value, 'limit-3');
-    render('food-tags', tags.food, '');
-    render('style-tags', tags.style, '');
+    render('social-tags', lists.social, 'limit-3');
+    render('emotion-tags', lists.emotion, 'limit-3');
+    render('value-tags', lists.value, 'limit-3');
+    render('food-tags', lists.food, '');
+    render('style-tags', lists.style, '');
 
+    // 限制 3 個勾選
     document.body.addEventListener('change', (e) => {
         if (e.target.classList.contains('limit-3')) {
             const group = e.target.parentElement;
@@ -210,11 +248,53 @@
         }
     });
 
+    // 儲存與讀取功能 (localStorage)
+    function saveAll() {
+        document.querySelectorAll('.persist').forEach(el => localStorage.setItem(el.id, el.value));
+        document.querySelectorAll('.persist-cb').forEach(el => localStorage.setItem(el.id, el.checked));
+    }
+
+    function loadAll() {
+        document.querySelectorAll('.persist').forEach(el => {
+            const val = localStorage.getItem(el.id);
+            if (val !== null) el.value = val;
+        });
+        document.querySelectorAll('.persist-cb').forEach(el => {
+            const val = localStorage.getItem(el.id);
+            if (val === "true") el.checked = true;
+        });
+        // 觸發一次勾選限制檢查
+        document.querySelectorAll('.tag-container').forEach(container => {
+            const checked = container.querySelectorAll('.limit-3:checked').length;
+            if (checked >= 3) {
+                container.querySelectorAll('.limit-3:not(:checked)').forEach(cb => cb.disabled = true);
+            }
+        });
+    }
+
+    function clearData() {
+        if(confirm("確定要清除所有資料並重新開始嗎？")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
     function goToVenue() {
         if(!document.getElementById('userName').value) { alert('請填寫名字'); return; }
+        saveAll();
         document.getElementById('setup-page').style.display = 'none';
         document.getElementById('venue-page').style.display = 'block';
+        window.scrollTo(0, 0);
     }
+
+    function goToSetup() {
+        document.getElementById('venue-page').style.display = 'none';
+        document.getElementById('setup-page').style.display = 'block';
+        window.scrollTo(0, 0);
+    }
+
+    // 初始化讀取
+    window.onload = loadAll;
 </script>
 </body>
 </html>
