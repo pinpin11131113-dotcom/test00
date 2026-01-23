@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>月下老人 - 月霞酒吧</title>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
     <style>
         body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #FFB74D; margin: 0; padding: 10px; color: #4E342E; }
@@ -76,6 +74,7 @@
                 <select id="uHoro"><option>牡羊座</option><option>金牛座</option><option>雙子座</option><option>巨蟹座</option><option>獅子座</option><option>處女座</option><option>天秤座</option><option>天蠍座</option><option>射手座</option><option>摩羯座</option><option>水瓶座</option><option>雙魚座</option></select>
                 <select id="uMbti">
                     <option value="">MBTI</option>
+                    <option>不知道 / 還在探索</option>
                     <optgroup label="分析家"><option>INTJ 建築師</option><option>INTP 邏輯學家</option><option>ENTJ 指揮官</option><option>ENTP 辯論家</option></optgroup>
                     <optgroup label="外交官"><option>INFJ 提倡者</option><option>INFP 調解者</option><option>ENFJ 主人公</option><option>ENFP 競選者</option></optgroup>
                     <optgroup label="守護者"><option>ISTJ 物流師</option><option>ISFJ 守衛者</option><option>ESTJ 總管</option><option>ESFJ 執政官</option></optgroup>
@@ -130,20 +129,7 @@
 </div>
 
 <script>
-    // 1. Firebase 設定
-    const firebaseConfig = {
-        apiKey: "AIzaSyDv4EOEmJ8dFwgZEv5mYtaiXuzbwgjMAUA",
-        authDomain: "jariah-match.firebaseapp.com",
-        projectId: "jariah-match",
-        storageBucket: "jariah-match.firebasestorage.app",
-        messagingSenderId: "863372390147",
-        appId: "1:863372390147:web:7541b1b478c33f3d824336",
-        measurementId: "G-GDNBERRJJ1"
-    };
-    try { firebase.initializeApp(firebaseConfig); } catch(e) { console.error(e); }
-    const storage = firebase.storage();
-
-    // 2. Apps Script 網址 (我已幫您填入您截圖中的正確網址)
+    // ⚠️ 請確認這是您最新的 Google Apps Script 網址
     const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
 
     const tagData = {
@@ -176,28 +162,57 @@
     if(localStorage.getItem('yueLaoUser')) showVenue();
     function logout() { if(confirm('確定要切換身份嗎？')) { localStorage.removeItem('yueLaoUser'); location.reload(); } }
 
-    async function uploadImage(file) {
-        if (!file) return "";
-        try {
-            const ref = storage.ref('users/' + new Date().getTime() + '_' + file.name);
-            await ref.put(file);
-            return await ref.getDownloadURL();
-        } catch(e) { throw e; }
+    // 🔥 壓縮圖片轉文字 (免 Firebase)
+    function compressImage(file) {
+        return new Promise((resolve) => {
+            if (!file) { resolve(""); return; }
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    const MAX_WIDTH = 300;
+                    const MAX_HEIGHT = 300;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    } else {
+                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                    resolve(dataUrl);
+                };
+            };
+        });
     }
 
     async function register() {
         const name = document.getElementById('uName').value;
         if(!name) return alert('請填寫名字');
-        document.getElementById('loading-overlay').style.display = 'block';
+        
+        const overlay = document.getElementById('loading-overlay');
+        overlay.innerText = "資料處理中...\n(照片轉換需要一點時間)";
+        overlay.style.display = 'block';
 
         try {
-            const p1Url = await uploadImage(document.getElementById('file1').files[0]);
-            const p2Url = await uploadImage(document.getElementById('file2').files[0]);
-            const p3Url = await uploadImage(document.getElementById('file3').files[0]);
+            const p1Data = await compressImage(document.getElementById('file1').files[0]);
+            const p2Data = await compressImage(document.getElementById('file2').files[0]);
+            const p3Data = await compressImage(document.getElementById('file3').files[0]);
 
             const payload = {
                 action: "register",
-                uName: name, p1: p1Url, p2: p2Url, p3: p3Url,
+                uName: name, p1: p1Data, p2: p2Data, p3: p3Data,
                 uBio: document.getElementById('uBio').value, uBirth: document.getElementById('uBirth').value, uHeight: document.getElementById('uHeight').value, uHoro: document.getElementById('uHoro').value, uMbti: document.getElementById('uMbti').value, 
                 uGender: document.getElementById('uGender').value, uSex: document.getElementById('uSex').value, uStatus: document.getElementById('uStatus').value,
                 uIceA: `[${document.getElementById('uIceQ').value}] ${document.getElementById('uIceA').value}`, 
@@ -206,17 +221,14 @@
                 tagSocial: getTags('social'), tagEmotion: getTags('emotion'), tagValue: getTags('value'), tagFood: getTags('food'), tagStyle: getTags('style')
             };
 
-            // ⚠️ 關鍵：等待資料傳輸完成
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
 
-            // 成功才放行
             localStorage.setItem('yueLaoUser', name);
             showVenue();
 
         } catch(e) {
-            document.getElementById('loading-overlay').style.display = 'none';
-            // 如果失敗，代表資料沒存進去，所以停在原地
-            alert("資料存檔失敗，請檢查網路！");
+            overlay.style.display = 'none';
+            alert("發生錯誤：" + e.message);
         }
     }
 
@@ -226,13 +238,16 @@
     let currentIndex = 0;
 
     async function showVenue() {
-        document.getElementById('loading-overlay').style.display = 'block';
+        const overlay = document.getElementById('loading-overlay');
+        overlay.innerText = "進入會場中...";
+        overlay.style.display = 'block';
+        
         try {
             const res = await fetch(API_URL);
             const data = await res.json();
             const me = localStorage.getItem('yueLaoUser');
             
-            document.getElementById('loading-overlay').style.display = 'none';
+            overlay.style.display = 'none';
             document.getElementById('setup-page').style.display = 'none';
             document.getElementById('venue-page').style.display = 'block';
             window.scrollTo(0,0);
@@ -249,9 +264,10 @@
             currentIndex = 0;
             renderCurrentCard();
         } catch(e) { 
-            // 讀取資料失敗時
-            document.getElementById('loading-overlay').style.display = 'none'; 
-            alert("無法讀取配對資料，請檢查網路");
+            overlay.style.display = 'none'; 
+            document.getElementById('setup-page').style.display = 'none';
+            document.getElementById('venue-page').style.display = 'block';
+            alert("目前可能沒有其他資料，或網路不穩。");
         }
     }
 
@@ -261,9 +277,9 @@
         document.getElementById('fallback-box').style.display = 'none';
         
         const u = venueData[currentIndex];
-        const img1 = u.p1 ? `<img src="${u.p1}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;">無</div>';
-        const img2 = u.p2 ? `<img src="${u.p2}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;">無</div>';
-        const img3 = u.p3 ? `<img src="${u.p3}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;">無</div>';
+        const img1 = u.p1 ? `<img src="${u.p1}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;background:#eee;">無照片</div>';
+        const img2 = u.p2 ? `<img src="${u.p2}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;background:#eee;">無照片</div>';
+        const img3 = u.p3 ? `<img src="${u.p3}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;background:#eee;">無照片</div>';
 
         container.innerHTML = `
             <div class="card">
