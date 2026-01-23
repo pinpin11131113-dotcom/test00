@@ -2,49 +2,42 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>Jariah 後台管理</title>
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <title>月霞酒吧 - 管理後台</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
-        .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; border: 1px solid #eee; text-align: left; }
-        th { background: #764ba2; color: white; }
-        .thumb { width: 45px; height: 45px; object-fit: cover; border-radius: 5px; margin-right: 5px; }
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+        .container { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { color: #E64A19; border-bottom: 2px solid #E64A19; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background: #FFECB3; }
+        .highlight { background: #FFF9C4; font-weight: bold; color: #E64A19; }
     </style>
 </head>
 <body>
-    <h1>月霞活動後台</h1>
-    <div class="card">
-        <button onclick="exportExcel()" style="padding:10px; background:#27ae60; color:white; border:none; border-radius:5px; cursor:pointer;">📊 匯出完整活動報表</button>
-    </div>
-    <div class="card">
-        <h2>參加者清單 (點擊 🔑 一鍵變身登入)</h2>
-        <table><thead><tr><th>照片</th><th>暱稱</th><th>手機</th><th>感情狀態</th><th>測試</th></tr></thead><tbody id="ub"></tbody></table>
-    </div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    const cfg = { apiKey: "AIzaSyDv4EOEmJ8dfWgZEv5mYtaiXuzbwgjMAUA", authDomain: "jariah-match.firebaseapp.com", projectId: "jariah-match", storageBucket: "jariah-match.firebasestorage.app", messagingSenderId: "863372390147", appId: "1:863372390147:web:7541b1b478c33f3d824336" };
-    const app = initializeApp(cfg); const db = getFirestore(app);
-
+<div class="container">
+    <h1>📊 月霞酒吧：配對總覽</h1>
+    <table>
+        <thead>
+            <tr><th>測試員 A</th><th>測試員 B</th><th>A 給 B</th><th>B 給 A</th><th>積分總和</th><th>狀態</th></tr>
+        </thead>
+        <tbody id="admin-body"></tbody>
+    </table>
+</div>
+<script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
     async function load() {
-        const snap = await getDocs(query(collection(db, "users"), orderBy("createdAt", "desc")));
-        const ub = document.getElementById('ub');
-        window.allUsers = [];
-        snap.forEach(doc => {
-            const u = doc.data();
-            window.allUsers.push({暱稱: u.name, 手機: u.phone, 感情狀態: u.stat, 自我認同: u.ident});
-            const imgs = u.photos ? u.photos.filter(p=>p).map(p=>`<img src="${p}" class="thumb">`).join('') : '👤';
-            ub.innerHTML += `<tr><td>${imgs}</td><td><b>${u.name}</b></td><td>${u.phone}</td><td>${u.stat||'--'}</td><td><button onclick="window.open('index.html?u=${u.name}')">🔑</button></td></tr>`;
-        });
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        const body = document.getElementById('admin-body');
+        body.innerHTML = data.adminStats.map(s => `
+            <tr class="${s.total > 5 ? 'highlight' : ''}">
+                <td>${s.p1}</td><td>${s.p2}</td>
+                <td>${s.s12}</td><td>${s.s21}</td>
+                <td>${s.total}</td>
+                <td>${s.total > 5 ? '✅ 契合' : '尚未配對'}</td>
+            </tr>
+        `).join('');
     }
-    window.exportExcel = () => {
-        const ws = XLSX.utils.json_to_sheet(window.allUsers);
-        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "名冊");
-        XLSX.writeFile(wb, "活動資料.xlsx");
-    };
     load();
 </script>
 </body>
