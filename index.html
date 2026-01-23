@@ -25,24 +25,45 @@
 
         .btn-main { width: 100%; padding: 18px; background: #E64A19; color: white; border: none; border-radius: 35px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
 
-        /* 單張卡片樣式 */
+        /* --- 卡片樣式大升級 --- */
         #venue-page { position: relative; min-height: 600px; display: none; }
         .card-stack { position: relative; width: 100%; max-width: 500px; margin: 0 auto; }
-        .card { background: white; border-radius: 20px; padding: 25px; border: 1px solid #FFCC80; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: 0 auto; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FFF3E0; padding-bottom: 10px; margin-bottom: 15px; }
-        .card-name { font-size: 24px; font-weight: bold; color: #E64A19; margin: 0; }
-        .card-mbti { background: #FFECB3; color: #E64A19; padding: 5px 12px; border-radius: 10px; font-size: 15px; font-weight: bold; }
-        .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .photo-item { aspect-ratio: 1/1; border-radius: 10px; border: 2px solid #FFCC80; object-fit: cover; width: 100%; background: #F5F5F5; }
-        .card-bio { font-size: 16px; color: #3E2723; line-height: 1.6; background: #FFF8E1; padding: 15px; border-radius: 15px; margin-bottom: 20px; white-space: pre-wrap; border-left: 5px solid #E64A19; }
-        .card-detail { font-size: 14px; color: #666; margin-bottom: 8px; border-bottom: 1px dashed #EEE; padding-bottom: 5px; }
-        .card-detail strong { color: #E64A19; margin-right: 5px; }
+        .card { background: white; border-radius: 20px; padding: 0; border: 1px solid #FFCC80; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: 0 auto; overflow: hidden; }
         
-        .action-area { margin-top: 20px; padding-top: 15px; border-top: 2px solid #FFF3E0; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .star-box { font-size: 36px; display: flex; gap: 10px; }
-        .star-btn { cursor: pointer; color: #E0E0E0; transition: 0.2s; transform: scale(1); }
-        .star-btn.active { color: #FFC107; }
-        .skip-btn { background: #CFD8DC; color: #546E7A; border: none; padding: 12px 30px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; }
+        /* 卡片頭部 */
+        .card-header-area { background: linear-gradient(135deg, #FFF3E0, #FFE0B2); padding: 20px; border-bottom: 1px solid #FFCC80; }
+        .card-name { font-size: 28px; font-weight: bold; color: #E64A19; margin: 0; }
+        .card-mbti { display: inline-block; background: #FF8A80; color: white; padding: 3px 10px; border-radius: 15px; font-size: 14px; font-weight: bold; margin-left: 10px; vertical-align: middle; }
+        
+        /* 照片區 */
+        .photo-scroll { display: flex; overflow-x: auto; padding: 10px; gap: 10px; background: #FAFAFA; scroll-behavior: smooth; }
+        .photo-item { flex: 0 0 85%; aspect-ratio: 1/1; object-fit: cover; border-radius: 15px; border: 1px solid #DDD; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .no-photo { flex: 0 0 100%; height: 200px; display: flex; align-items: center; justify-content: center; background: #EEE; color: #999; border-radius: 15px; }
+
+        /* 內容區 */
+        .card-body { padding: 20px; }
+        .section-title { font-size: 18px; font-weight: bold; color: #5D4037; margin-top: 20px; margin-bottom: 10px; border-left: 4px solid #E64A19; padding-left: 8px; background: #FFF8E1; padding-top: 5px; padding-bottom: 5px; }
+        .bio-text { font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; margin-bottom: 15px; }
+        
+        .info-row { display: flex; margin-bottom: 8px; border-bottom: 1px dashed #EEE; padding-bottom: 5px; font-size: 15px; }
+        .info-label { width: 90px; font-weight: bold; color: #8D6E63; flex-shrink: 0; }
+        .info-value { color: #333; flex-grow: 1; }
+
+        /* 標籤顯示 */
+        .tag-display-group { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+        .tag-badge { font-size: 12px; padding: 4px 10px; border-radius: 12px; color: white; display: inline-block; }
+        .tag-social { background: #FFB74D; }
+        .tag-emotion { background: #90A4AE; }
+        .tag-value { background: #81C784; }
+        .tag-food { background: #FF8A65; }
+        .tag-style { background: #BA68C8; }
+
+        /* 按鈕區 */
+        .action-area { padding: 20px; background: #FFF3E0; display: flex; flex-direction: column; align-items: center; gap: 15px; border-top: 1px solid #FFCC80; }
+        .star-box { font-size: 36px; display: flex; gap: 15px; }
+        .star-btn { cursor: pointer; transition: 0.2s; transform: scale(1); filter: grayscale(100%); opacity: 0.5; }
+        .star-btn:hover, .star-btn:active { transform: scale(1.2); filter: grayscale(0%); opacity: 1; }
+        .skip-btn { background: #CFD8DC; color: #546E7A; border: none; padding: 12px 40px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; }
 
         #match-notification { display: none; background: #FFF3E0; border: 3px dashed #E64A19; border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; }
         #fallback-box { text-align: center; display: none; margin-top: 50px; padding: 30px; background: #FFF3E0; border-radius: 20px; }
@@ -277,22 +298,63 @@
         document.getElementById('fallback-box').style.display = 'none';
         
         const u = venueData[currentIndex];
-        const img1 = u.p1 ? `<img src="${u.p1}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;background:#eee;">無照片</div>';
-        const img2 = u.p2 ? `<img src="${u.p2}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;background:#eee;">無照片</div>';
-        const img3 = u.p3 ? `<img src="${u.p3}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;background:#eee;">無照片</div>';
+        
+        // 處理照片 (如果沒有照片，顯示灰色方塊)
+        const renderImg = (src) => src ? `<img src="${src}" class="photo-item">` : '';
+        const photosHtml = [u.p1, u.p2, u.p3].map(renderImg).join('') || '<div class="no-photo">無照片</div>';
+
+        // 處理標籤
+        const renderTags = (str, cls) => str ? str.split(',').map(t => `<span class="tag-badge ${cls}">${t}</span>`).join('') : '';
 
         container.innerHTML = `
             <div class="card">
-                <div class="card-header"><span class="card-name">${u.name} - ${u.horo}</span><span class="card-mbti">${u.mbti}</span></div>
-                <div class="photo-grid">${img1}${img2}${img3}</div>
-                <div class="card-bio">${u.bio || "..."}</div>
-                <div class="card-detail"><strong>基本：</strong>${u.birth} / ${u.height}cm / ${u.status}</div>
-                <div class="card-detail"><strong>破冰：</strong>${u.ice}</div>
-                <div class="card-detail"><strong>寵物：</strong>${u.pet}</div>
-                <div class="card-detail"><strong>期待：</strong>${u.date}</div>
-                <div class="card-detail"><strong>興趣：</strong>${u.movie} / ${u.music} / ${u.sport}</div>
+                <div class="card-header-area">
+                    <span class="card-name">${u.name}</span>
+                    <span class="card-mbti">${u.mbti}</span>
+                    <div style="margin-top:5px; font-size:14px; color:#795548;">
+                        ${u.horo} / ${u.birth} / ${u.height}cm
+                    </div>
+                </div>
+
+                <div class="photo-scroll">
+                    ${photosHtml}
+                </div>
+
+                <div class="card-body">
+                    <div class="bio-text">${u.bio || "這個人很神秘，還沒寫自我介紹..."}</div>
+
+                    <div class="section-title">基本檔案</div>
+                    <div class="info-row"><div class="info-label">身份</div><div class="info-value">${u.gender}</div></div>
+                    <div class="info-row"><div class="info-label">性取向</div><div class="info-value">${u.sex}</div></div>
+                    <div class="info-row"><div class="info-label">感情狀態</div><div class="info-value">${u.status}</div></div>
+                    <div class="info-row"><div class="info-label">關於寵物</div><div class="info-value">${u.pet}</div></div>
+
+                    <div class="section-title">深入靈魂</div>
+                    <div class="info-row" style="flex-direction:column;">
+                        <div class="info-label" style="width:100%;margin-bottom:5px;">💬 破冰回答 (${u.ice.split(']')[0].replace('[','')})</div>
+                        <div class="info-value" style="background:#FFF3E0; padding:10px; border-radius:10px;">${u.ice.split(']')[1] || u.ice}</div>
+                    </div>
+                    <div class="info-row"><div class="info-label">約會期待</div><div class="info-value">${u.date}</div></div>
+
+                    <div class="section-title">興趣喜好</div>
+                    <div class="info-row"><div class="info-label">電影</div><div class="info-value">${u.movie}</div></div>
+                    <div class="info-row"><div class="info-label">音樂</div><div class="info-value">${u.music}</div></div>
+                    <div class="info-row"><div class="info-label">運動</div><div class="info-value">${u.sport}</div></div>
+                    <div class="info-row"><div class="info-label">其他</div><div class="info-value">${u.hobby}</div></div>
+
+                    <div class="section-title">個性標籤</div>
+                    <div class="tag-display-group">${renderTags(u.tagSocial, 'tag-social')}</div>
+                    <div class="tag-display-group">${renderTags(u.tagEmotion, 'tag-emotion')}</div>
+                    <div class="tag-display-group">${renderTags(u.tagValue, 'tag-value')}</div>
+
+                    <div class="section-title">品味與風格</div>
+                    <div class="tag-display-group">${renderTags(u.tagFood, 'tag-food')}</div>
+                    <div class="tag-display-group">${renderTags(u.tagStyle, 'tag-style')}</div>
+                </div>
+
                 <div class="action-area">
-                    <div class="star-box">${[1,2,3,4,5].map(i => `<span class="star-btn" onclick="handleRate('${u.name}', ${i})">★</span>`).join('')}</div>
+                    <div style="margin-bottom:10px; color:#E64A19; font-weight:bold;">給星星 (覺得有緣分嗎？)</div>
+                    <div class="star-box">${[1,2,3,4,5].map(i => `<div class="star-btn" onclick="handleRate('${u.name}', ${i})">⭐</div>`).join('')}</div>
                     <button class="skip-btn" onclick="handleRate('${u.name}', 0)">略過</button>
                 </div>
             </div>`;
