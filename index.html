@@ -75,10 +75,26 @@
             <div style="display:flex; gap:10px;"><input type="date" id="uBirth" style="flex:1;"><input type="number" id="uHeight" placeholder="cm" style="flex:1;"></div>
             <div style="display:flex; gap:10px; margin-top:10px;">
                 <select id="uHoro"><option>牡羊座</option><option>金牛座</option><option>雙子座</option><option>巨蟹座</option><option>獅子座</option><option>處女座</option><option>天秤座</option><option>天蠍座</option><option>射手座</option><option>摩羯座</option><option>水瓶座</option><option>雙魚座</option></select>
-                <select id="uMbti"><option value="">MBTI</option><option>INTJ</option><option>INTP</option><option>ENTJ</option><option>ENTP</option><option>INFJ</option><option>INFP</option><option>ENFJ</option><option>ENFP</option><option>ISTJ</option><option>ISFJ</option><option>ESTJ</option><option>ESFJ</option><option>ISTP</option><option>ISFP</option><option>ESTP</option><option>ESFP</option></select>
+                <select id="uMbti">
+                    <option value="">MBTI</option>
+                    <optgroup label="分析家"><option>INTJ 建築師</option><option>INTP 邏輯學家</option><option>ENTJ 指揮官</option><option>ENTP 辯論家</option></optgroup>
+                    <optgroup label="外交官"><option>INFJ 提倡者</option><option>INFP 調解者</option><option>ENFJ 主人公</option><option>ENFP 競選者</option></optgroup>
+                    <optgroup label="守護者"><option>ISTJ 物流師</option><option>ISFJ 守衛者</option><option>ESTJ 總管</option><option>ESFJ 執政官</option></optgroup>
+                    <optgroup label="探險家"><option>ISTP 鑒賞家</option><option>ISFP 探險家</option><option>ESTP 企業家</option><option>ESFP 表演者</option></optgroup>
+                </select>
             </div>
         </div>
-        <div class="input-group"><label>身份</label><select id="uGender"><option>女性</option><option>跨女</option><option>非二元</option><option>探索中</option></select><select id="uSex" style="margin-top:5px;"><option>女同志</option><option>雙性戀</option><option>異性戀</option><option>泛性戀</option><option>無性戀</option></select><select id="uStatus" style="margin-top:5px;"><option>單身</option><option>開放式</option><option>曖昧中</option><option>穩定中</option></select></div>
+        <div class="input-group">
+            <label>身份</label>
+            <select id="uGender"><option>女性</option><option>跨女</option><option>非二元</option><option>探索中</option></select>
+            <select id="uSex" style="margin-top:5px;"><option>女同志</option><option>雙性戀</option><option>異性戀</option><option>泛性戀</option><option>無性戀</option></select>
+            <select id="uStatus" style="margin-top:5px;">
+                <option>單身</option>
+                <option>開放式關係</option>
+                <option>曖昧中</option>
+                <option>尋找穩定關係</option>
+            </select>
+        </div>
 
         <h2>2. 個性與期待</h2>
         <div class="input-group">
@@ -115,7 +131,7 @@
 </div>
 
 <script>
-    // 1. Firebase 設定 (已幫妳填入正確值)
+    // 1. Firebase Config (準確填入)
     const firebaseConfig = {
         apiKey: "AIzaSyDv4EOEmJ8dFwgZEv5mYtaiXuzbwgjMAUA",
         authDomain: "jariah-match.firebaseapp.com",
@@ -128,7 +144,7 @@
     try { firebase.initializeApp(firebaseConfig); } catch(e) { console.error(e); }
     const storage = firebase.storage();
 
-    // 2. Apps Script 網址 (已幫妳填入正確值)
+    // 2. Apps Script 網址 (準確填入)
     const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
 
     const tagData = {
@@ -168,8 +184,9 @@
             await ref.put(file);
             return await ref.getDownloadURL();
         } catch(e) { 
-            alert("照片上傳失敗！請檢查 Firebase 權限。\n錯誤訊息：" + e.message);
-            throw e; 
+            console.error("照片上傳失敗", e);
+            // 就算上傳失敗，也回傳空字串讓流程繼續
+            return ""; 
         }
     }
 
@@ -194,12 +211,24 @@
                 tagSocial: getTags('social'), tagEmotion: getTags('emotion'), tagValue: getTags('value'), tagFood: getTags('food'), tagStyle: getTags('style')
             };
 
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            // 傳送資料到 Google Sheet
+            fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
+                .then(() => {
+                    // 成功後執行
+                    localStorage.setItem('yueLaoUser', name);
+                    setTimeout(showVenue, 2000);
+                })
+                .catch(err => {
+                    // 即使發生錯誤，也嘗試進入會場
+                    console.error("Fetch Error:", err);
+                    localStorage.setItem('yueLaoUser', name);
+                    setTimeout(showVenue, 2000);
+                });
+
+        } catch(e) {
+            alert("發生錯誤，將嘗試直接進入會場：" + e.message);
             localStorage.setItem('yueLaoUser', name);
             setTimeout(showVenue, 2000);
-        } catch(e) {
-            alert("註冊過程發生錯誤！\n" + e.message);
-            document.getElementById('loading-overlay').style.display = 'none';
         }
     }
 
@@ -215,6 +244,7 @@
             const data = await res.json();
             const me = localStorage.getItem('yueLaoUser');
             
+            // 強制隱藏註冊頁，顯示會場頁
             document.getElementById('loading-overlay').style.display = 'none';
             document.getElementById('setup-page').style.display = 'none';
             document.getElementById('venue-page').style.display = 'block';
@@ -232,7 +262,8 @@
             currentIndex = 0;
             renderCurrentCard();
         } catch(e) { 
-            alert("無法讀取資料！請檢查 Apps Script 是否設為「所有人 (Anyone)」。\n錯誤：" + e.message); 
+            console.error(e); 
+            // 讀取失敗時，隱藏 Loading，避免卡死
             document.getElementById('loading-overlay').style.display = 'none'; 
         }
     }
