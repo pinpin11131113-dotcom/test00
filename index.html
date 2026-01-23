@@ -10,11 +10,10 @@
     <style>
         body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #FFB74D; margin: 0; padding: 10px; color: #4E342E; }
         .container { max-width: 650px; margin: 10px auto; background-color: #FFF9F0; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; min-height: 80vh; }
-        
         .logout-btn { position: absolute; top: 20px; right: 20px; background: #8D6E63; color: white; border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; font-size: 13px; z-index: 10; }
         h1 { color: #E64A19; text-align: center; font-size: 32px; margin-bottom: 5px; }
         h2 { border-left: 5px solid #E64A19; padding-left: 10px; color: #5D4037; font-size: 20px; margin-top: 35px; background: #FFECB3; padding: 5px; border-radius: 5px; }
-
+        
         .input-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; }
         input, select, textarea { width: 100%; padding: 12px; border: 1.5px solid #FFCC80; border-radius: 12px; box-sizing: border-box; font-size: 16px; background: white; }
@@ -131,7 +130,7 @@
 </div>
 
 <script>
-    // 1. Firebase Config (準確填入)
+    // 1. Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyDv4EOEmJ8dFwgZEv5mYtaiXuzbwgjMAUA",
         authDomain: "jariah-match.firebaseapp.com",
@@ -144,7 +143,7 @@
     try { firebase.initializeApp(firebaseConfig); } catch(e) { console.error(e); }
     const storage = firebase.storage();
 
-    // 2. Apps Script 網址 (準確填入)
+    // 2. Apps Script 網址 (已更新為最新)
     const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
 
     const tagData = {
@@ -183,11 +182,7 @@
             const ref = storage.ref('users/' + new Date().getTime() + '_' + file.name);
             await ref.put(file);
             return await ref.getDownloadURL();
-        } catch(e) { 
-            console.error("照片上傳失敗", e);
-            // 就算上傳失敗，也回傳空字串讓流程繼續
-            return ""; 
-        }
+        } catch(e) { throw e; }
     }
 
     async function register() {
@@ -211,24 +206,15 @@
                 tagSocial: getTags('social'), tagEmotion: getTags('emotion'), tagValue: getTags('value'), tagFood: getTags('food'), tagStyle: getTags('style')
             };
 
-            // 傳送資料到 Google Sheet
-            fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
-                .then(() => {
-                    // 成功後執行
-                    localStorage.setItem('yueLaoUser', name);
-                    setTimeout(showVenue, 2000);
-                })
-                .catch(err => {
-                    // 即使發生錯誤，也嘗試進入會場
-                    console.error("Fetch Error:", err);
-                    localStorage.setItem('yueLaoUser', name);
-                    setTimeout(showVenue, 2000);
-                });
+            // ⚠️ 嚴格模式：必須等待 fetch 完成
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+
+            localStorage.setItem('yueLaoUser', name);
+            showVenue();
 
         } catch(e) {
-            alert("發生錯誤，將嘗試直接進入會場：" + e.message);
-            localStorage.setItem('yueLaoUser', name);
-            setTimeout(showVenue, 2000);
+            document.getElementById('loading-overlay').style.display = 'none';
+            alert("資料儲存失敗，請檢查網路連線或稍後再試。\n(照片可能上傳失敗，或 Google 服務異常)");
         }
     }
 
@@ -238,14 +224,15 @@
     let currentIndex = 0;
 
     async function showVenue() {
-        document.getElementById('loading-overlay').style.display = 'block';
+        const overlay = document.getElementById('loading-overlay');
+        overlay.style.display = 'block';
+        
         try {
             const res = await fetch(API_URL);
             const data = await res.json();
             const me = localStorage.getItem('yueLaoUser');
             
-            // 強制隱藏註冊頁，顯示會場頁
-            document.getElementById('loading-overlay').style.display = 'none';
+            overlay.style.display = 'none';
             document.getElementById('setup-page').style.display = 'none';
             document.getElementById('venue-page').style.display = 'block';
             window.scrollTo(0,0);
@@ -262,9 +249,8 @@
             currentIndex = 0;
             renderCurrentCard();
         } catch(e) { 
-            console.error(e); 
-            // 讀取失敗時，隱藏 Loading，避免卡死
-            document.getElementById('loading-overlay').style.display = 'none'; 
+            overlay.style.display = 'none'; 
+            alert("無法讀取配對資料，請檢查網路");
         }
     }
 
