@@ -21,7 +21,7 @@
         input, select, textarea { width: 100%; padding: 12px; border: 1.5px solid #FFCC80; border-radius: 12px; box-sizing: border-box; font-size: 16px; background: white; }
         textarea { min-height: 120px; }
 
-        /* 標籤 */
+        /* 標籤樣式 */
         .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .tag-checkbox { display: none; }
         .tag-label { display: inline-block; padding: 8px 16px; border: 1.5px solid #FFCC80; border-radius: 20px; background: #FFF; color: #5D4037; cursor: pointer; font-size: 13px; transition: 0.2s; }
@@ -33,14 +33,14 @@
         /* --- 單張卡片模式專用樣式 --- */
         #venue-page { position: relative; min-height: 600px; display: none; }
         
+        /* 卡片置中堆疊 */
         .card-stack { position: relative; width: 100%; max-width: 500px; margin: 0 auto; }
         
         .card { 
             background: white; border-radius: 20px; padding: 25px; 
             border: 1px solid #FFCC80; text-align: left; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            /* 讓卡片居中顯示 */
-            margin: 0 auto;
+            margin: 0 auto; /* 確保卡片置中 */
         }
 
         .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FFF3E0; padding-bottom: 10px; margin-bottom: 15px; }
@@ -129,7 +129,7 @@
         <div class="input-group"><label>性取向</label><select id="uSex"><option>女同志</option><option>雙性戀</option><option>異性戀</option><option>泛性戀</option><option>無性戀</option></select></div>
         <div class="input-group"><label>感情狀態</label><select id="uStatus"><option>單身</option><option>開放式關係</option><option>曖昧中</option><option>尋找穩定關係</option></select></div>
 
-        <h2>2. 個性與期待 (已修復選項)</h2>
+        <h2>2. 個性與期待</h2>
         <div class="input-group">
             <label>破冰問題</label>
             <select id="uIceQ" style="margin-bottom:8px;">
@@ -181,7 +181,7 @@
 </div>
 
 <script>
-    // --- ⚠️ 妳的 Firebase Config (已填入) ---
+    // --- ⚠️ 妳的 Firebase Config (已自動填入) ---
     const firebaseConfig = {
         apiKey: "AIzaSyDv4EOEmJ8dFwgZEv5mYtaiXuzbwgjMAUA",
         authDomain: "jariah-match.firebaseapp.com",
@@ -242,7 +242,7 @@
             return await ref.getDownloadURL();
         } catch(e) {
             console.error("圖片上傳失敗", e);
-            return ""; // 失敗回傳空字串，避免程式卡死
+            return ""; 
         }
     }
 
@@ -256,7 +256,7 @@
         const p2Url = await uploadImage(document.getElementById('file2').files[0]);
         const p3Url = await uploadImage(document.getElementById('file3').files[0]);
 
-        // 組合破冰問答： [題目] 答案
+        // 組合破冰
         const iceQ = document.getElementById('uIceQ').value;
         const iceA = document.getElementById('uIceA').value;
         const combinedIce = `[${iceQ}] ${iceA}`;
@@ -273,8 +273,8 @@
             uGender: document.getElementById('uGender').value,
             uSex: document.getElementById('uSex').value, 
             uStatus: document.getElementById('uStatus').value,
-            uIceA: combinedIce, // 存入組合好的破冰
-            uPet: document.getElementById('uPet').value, // 存入選單值
+            uIceA: combinedIce, 
+            uPet: document.getElementById('uPet').value,
             uDate: document.getElementById('uDate').value,
             uMovie: document.getElementById('uMovie').value,
             uMusic: document.getElementById('uMusic').value,
@@ -297,25 +297,24 @@
         }
     }
 
-    // --- 單張卡片瀏覽邏輯變數 ---
+    // --- 單張卡片變數與邏輯 ---
     let venueData = [];
     let currentIndex = 0;
 
     async function showVenue() {
-        document.getElementById('loading-overlay').style.display = 'block'; // 顯示讀取中
+        document.getElementById('loading-overlay').style.display = 'block';
         
         try {
             const res = await fetch(API_URL);
             const data = await res.json();
             const me = localStorage.getItem('yueLaoUser');
             
-            // 隱藏註冊頁，顯示會場
             document.getElementById('loading-overlay').style.display = 'none';
             document.getElementById('setup-page').style.display = 'none';
             document.getElementById('venue-page').style.display = 'block';
             window.scrollTo(0,0);
 
-            // 1. 處理配對通知 (只顯示總分>5且雙方都評過分的)
+            // 1. 配對通知
             const myMatches = data.adminStats.filter(s => (s.p1 === me || s.p2 === me) && s.isMatch);
             const matchBox = document.getElementById('match-notification');
             if(myMatches.length > 0) {
@@ -329,11 +328,11 @@
                 matchBox.style.display = 'none';
             }
 
-            // 2. 準備卡片佇列 (排除自己，排除已評分的人)
+            // 2. 準備佇列 (排除自己、排除已評)
             const ratedList = data.ratedHistory || {};
             venueData = data.users.filter(u => {
-                if (u.name === me) return false; // 排除自己
-                if (ratedList[me + "_" + u.name]) return false; // 排除已評分
+                if (u.name === me) return false; 
+                if (ratedList[me + "_" + u.name]) return false;
                 return true;
             });
 
@@ -351,22 +350,21 @@
         const container = document.getElementById('single-card-container');
         const fallback = document.getElementById('fallback-box');
 
-        // 如果沒有人可以看了
+        // 沒人可看了
         if (currentIndex >= venueData.length) {
-            container.innerHTML = ''; // 清空
-            fallback.style.display = 'block'; // 顯示月老
+            container.innerHTML = '';
+            fallback.style.display = 'block';
             return;
         }
 
         fallback.style.display = 'none';
         const u = venueData[currentIndex];
 
-        // 處理照片 (有圖顯示圖，沒圖顯示預設)
+        // 照片處理
         const img1 = u.p1 ? `<img src="${u.p1}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;">無照片</div>';
         const img2 = u.p2 ? `<img src="${u.p2}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;">無照片</div>';
         const img3 = u.p3 ? `<img src="${u.p3}" class="photo-item">` : '<div class="photo-item" style="display:flex;align-items:center;justify-content:center;color:#CCC;">無照片</div>';
 
-        // 生成單張卡片 HTML
         container.innerHTML = `
             <div class="card">
                 <div class="card-header">
@@ -378,7 +376,7 @@
                     ${img1}${img2}${img3}
                 </div>
 
-                <div class="card-bio">${u.bio || "（這位朋友還沒寫自我介紹...）"}</div>
+                <div class="card-bio">${u.bio || "（这位朋友還沒寫自我介紹...）"}</div>
 
                 <div class="card-detail"><strong>基本：</strong>${u.birth || ''} / ${u.height || ''}cm / ${u.status || ''}</div>
                 <div class="card-detail"><strong>破冰：</strong>${u.ice || ''}</div>
@@ -405,20 +403,19 @@
     async function handleRate(toUser, score) {
         const fromUser = localStorage.getItem('yueLaoUser');
         
-        // 1. 視覺回饋：清空卡片，顯示傳送中 (或直接切下一張)
+        // 視覺回饋
         const container = document.getElementById('single-card-container');
         container.innerHTML = `<div style="text-align:center; padding:50px; color:#E64A19; font-weight:bold;">心意傳送中... ❤️</div>`;
 
-        // 2. 發送資料
+        // 傳送
         try {
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "rate", fromUser, toUser, stars: score }) });
         } catch(e) {
-            console.error("評分上傳失敗", e);
+            console.error("評分失敗", e);
         }
 
-        // 3. 切換到下一位
+        // 下一位
         currentIndex++;
-        // 稍微延遲一點點讓使用者感覺到切換
         setTimeout(() => {
             renderCurrentCard();
         }, 500);
