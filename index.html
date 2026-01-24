@@ -151,7 +151,10 @@
 </div>
 
 <script>
-    /* 🔥【關鍵修復】: 標籤產生程式碼移到最上面，保證一進來就看得到 */
+    // ⚠️ 請確認這行網址是正確的
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
+
+    /* 🔥 1. 標籤產生邏輯 (優先執行) */
     (function initTags() {
         const tagData = {
             social: ["熱情主動", "慢熱內斂", "幽默風趣", "優質傾聽", "直言不諱", "溫柔體貼", "獨立自主", "深度對話", "隨和隨興", "好奇心強", "觀察敏銳", "給予空間", "有主見", "不拘小節", "優雅得體"],
@@ -181,7 +184,6 @@
         }
     })();
 
-    // 監聽選取限制 (最多3個)
     document.body.addEventListener('change', (e) => {
         if (e.target.classList.contains('limit-3')) {
             const group = e.target.parentElement;
@@ -190,35 +192,15 @@
         }
     });
 
-    // ----------------------------------------------------------------
-    // 系統邏輯區 (這部分如果有錯，也不會影響上面標籤的顯示)
-    // ----------------------------------------------------------------
+    // 🔥 2. 系統初始化 (移除 Firebase，直接用 Google Sheet)
+    document.getElementById('loading-overlay').style.display = 'none';
 
-    // ⚠️ 請填入您的 Apps Script 網址
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzGGOXqSP0_De4InUp-xBGIux_CuCAS600ACuLE-UFLzlPkPrR_3U6QGCHJKIK1dbMV/exec';
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyDv4EOEmJ8dFwgZEv5mYtaiXuzbwgjMAUA",
-        authDomain: "jariah-match.firebaseapp.com",
-        projectId: "jariah-match",
-        appId: "1:863372390147:web:7541b1b478c33f3d824336"
-    };
-
-    // 安全載入 Firebase
-    try {
-        const script = document.createElement('script');
-        script.src = "https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js";
-        script.onload = () => {
-            try { firebase.initializeApp(firebaseConfig); } catch(e) {}
-            document.getElementById('loading-overlay').style.display = 'none';
-            if(localStorage.getItem('yueLaoUser')) showVenue();
-        };
-        document.head.appendChild(script);
-    } catch(e) { console.log("Firebase error", e); }
+    if(localStorage.getItem('yueLaoUser')) {
+        showVenue();
+    } 
 
     function logout() { if(confirm('確定要切換身份嗎？')) { localStorage.removeItem('yueLaoUser'); location.reload(); } }
 
-    // 圖片轉文字
     function compressImage(file) {
         return new Promise((resolve) => {
             if (!file) { resolve(""); return; }
